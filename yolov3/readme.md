@@ -7,7 +7,11 @@ git clone https://github.com/pjreddie/darknet.git
 cd darknet
 make
 ```
+download the weights
 
+```
+wget https://pjreddie.com/media/files/yolov3.weights
+```
 
 ## Pre-processing data
 
