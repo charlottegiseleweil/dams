@@ -38,7 +38,7 @@ wget https://pjreddie.com/media/files/darknet53.conv.74
 + Create of a copy `/darknet/cfg/yolov3.cfg` in your directory
 + Modify `yolov3.cfg` file to work on one class:
     + Line 3, set `batch=16`
-    + Line 4, set `subdivisions=16'
+    + Line 4, set `subdivisions=16`
     + Line 603, set `filters=18`
     + Line 610, set `classes=1`
     + Line 689, set `filters=18`
