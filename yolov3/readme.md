@@ -17,7 +17,7 @@ wget https://pjreddie.com/media/files/darknet53.conv.74
 
 ## Prepare YOLO-ready data
 
-#### Run `prepare_darknet_training_data.ipynb`
+#### Run `Make_Darknet_inputs.ipynb`
 + Inputs:
     + directory of dam images
     + directory of not_a_dam images
@@ -26,17 +26,17 @@ wget https://pjreddie.com/media/files/darknet53.conv.74
     + `/labels` directory with `/train` and `/test` subdirectories
         + each label contains the mean x value, mean y value, width, and height of the bounding box in the corresponding image file
         + all numbers are normalized between 0 and 1
+    + `test_images_filepaths.txt`
+    + `train_images_filepaths.txt`
     + `dams.names`
         + contains class names
     + `dams.data`
         + contains directory information for darknet
-    + `test_images.txt`
-    + `train_images.txt`
         
 #### Modify `yolov3.cfg`
 
 + Create of a copy `/darknet/cfg/yolov3.cfg` in your directory
-+ Modify `yolov3.cfg` file to work on one class:
++ Modify `yolov3.cfg` file to work on one class, as per detailed at  https://github.com/WyattAutomation/Train-YOLOv3-with-OpenImagesV4#cfg-file:
     + Line 3, set `batch=16`
     + Line 4, set `subdivisions=16`
     + Line 603, set `filters=18`, filters = (number_of_classes + 5) * 3 
