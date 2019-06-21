@@ -17,7 +17,7 @@ wget https://pjreddie.com/media/files/darknet53.conv.74
 
 ## Prepare YOLO-ready data
 
-### Run `prepare_darknet_training_data.ipynb`
+#### Run `prepare_darknet_training_data.ipynb`
 + Inputs:
     + zip of all dam images: `dam.zip`
     + zip of all not dam images: `not_a_dam.zip`
@@ -33,7 +33,7 @@ wget https://pjreddie.com/media/files/darknet53.conv.74
     + `test_images.txt`
     + `train_images.txt`
         
-### Modify `yolov3.cfg`
+#### Modify `yolov3.cfg`
 
 + Create of a copy `/darknet/cfg/yolov3.cfg` in your directory
 + Modify `yolov3.cfg` file to work on one class:
@@ -50,7 +50,7 @@ wget https://pjreddie.com/media/files/darknet53.conv.74
         
 ## Training Procedure
 
-Required files and directories:
+#### Required files and directories:
 + Classes
    + `dams.names'`
    + contains class names, there should be only one, dam
@@ -64,6 +64,8 @@ Required files and directories:
 + Labels directory
    + `/labels`, path should be in `dams.data`
 + pretrained weights: `darknet53.conv.74`
+
+#### Train model
 
 Run `./darknet detector train /path/to/dams.data /path/to/dams.cfg /path/to/weights`
 + Example: `./darknet detector train yolov3/dams.data yolov3/dams.cfg darknet53.conv.74`
