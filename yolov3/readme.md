@@ -49,5 +49,14 @@ wget https://pjreddie.com/media/files/darknet53.conv.74
         
 ## Training Procedure
 
+Required files:
++ `dams.names`
+   + contains class names
++ `dams.data`
+   + contains directory paths for darknet
++ `dams.cfg`
++ `/images`
++ `/labels`
+
 Run `./darknet detector train /path/to/file.data /path/to/file.cfg /path/to/weights`
 + Example: `./darknet detector train yolov3/dams.data yolov3/dams.cfg darknet53.conv.74`
