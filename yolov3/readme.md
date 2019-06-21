@@ -55,6 +55,7 @@ Required files:
    + contains class names
 + `dams.data`
    + contains directory paths for darknet
+   + this includes paths for the images and labels
 + `dams.cfg`
 + `/images`
 + `/labels`
