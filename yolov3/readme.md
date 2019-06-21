@@ -50,15 +50,19 @@ wget https://pjreddie.com/media/files/darknet53.conv.74
         
 ## Training Procedure
 
-Required files:
-+ `dams.names`
-   + contains class names
-+ `dams.data`
+Required files and directories:
++ Classes
+   + `dams.names'`
+   + contains class names, there should be only one, dam
++ Directory Paths
+   + `dams.data`
    + contains directory paths for darknet
-   + this includes paths for the images and labels
-+ `dams.cfg`
-+ `/images`
-+ `/labels`
+   + this includes paths for the `/images`, `/labels`, `train.txt`, `test.txt`, and `backup`
++ Modified `dams.cfg` (see above)
++ Image directory
+   + `/images`, path should be in `dams.data`
++ Labels directory
+   + `/labels`, path should be in `dams.data`
 + pretrained weights: `darknet53.conv.74`
 
 Run `./darknet detector train /path/to/dams.data /path/to/dams.cfg /path/to/weights`
