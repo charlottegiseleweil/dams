@@ -39,12 +39,12 @@ wget https://pjreddie.com/media/files/darknet53.conv.74
 + Modify `yolov3.cfg` file to work on one class:
     + Line 3, set `batch=16`
     + Line 4, set `subdivisions=16`
-    + Line 603, set `filters=18`
-    + Line 610, set `classes=1`
-    + Line 689, set `filters=18`
-    + Line 696, set `classes=1`
-    + Line 776, set `filters=18`
-    + Line 783, set `classes=1`
+    + Line 603, set `filters=18`, filters = (number_of_classes + 5) * 3 
+    + Line 610, set `classes=1`, we have one class (dams)
+    + Line 689, set `filters=18`, filters = (number_of_classes + 5) * 3 
+    + Line 696, set `classes=1`, we have one class (dams)
+    + Line 776, set `filters=18`, filters = (number_of_classes + 5) * 3 
+    + Line 783, set `classes=1`, we have one class (dams)
 + Modify name of cfg file to keep track of edits
         
 ## Training Procedure
@@ -57,6 +57,7 @@ Required files:
 + `dams.cfg`
 + `/images`
 + `/labels`
++ pretrained weights: `darknet53.conv.74`
 
-Run `./darknet detector train /path/to/file.data /path/to/file.cfg /path/to/weights`
+Run `./darknet detector train /path/to/dams.data /path/to/dams.cfg /path/to/weights`
 + Example: `./darknet detector train yolov3/dams.data yolov3/dams.cfg darknet53.conv.74`
