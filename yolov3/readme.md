@@ -45,6 +45,7 @@ wget https://pjreddie.com/media/files/darknet53.conv.74
     + Line 696, set `classes=1`, we have one class (dams)
     + Line 776, set `filters=18`, filters = (number_of_classes + 5) * 3 
     + Line 783, set `classes=1`, we have one class (dams)
+    + we set 18 filters because each cell in YOLOv3 predicts 3 bounding boxes. Each bounding box has 5 + number_of_classes attributes (dimenions, objectness score, class confidence)
 + Modify name of cfg file to keep track of edits
         
 ## Training Procedure
