@@ -19,8 +19,8 @@ wget https://pjreddie.com/media/files/darknet53.conv.74
 
 #### Run `prepare_darknet_training_data.ipynb`
 + Inputs:
-    + zip of all dam images: `dam.zip`
-    + zip of all not dam images: `not_a_dam.zip`
+    + directory of dam images
+    + directory of not_a_dam images
 + Outputs:
     + `/images` directory with `/train` and `/test` subdirectories
     + `/labels` directory with `/train` and `/test` subdirectories
