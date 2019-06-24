@@ -52,15 +52,15 @@ wget https://pjreddie.com/media/files/darknet53.conv.74
 
 #### Required files and directories:
 + Classes
-   + `dams.names'`
+   + `dams.names`
    + contains class names, there should be only one, dam
 + Directory Paths
    + `dams.data`
    + contains directory paths for darknet
-   + this includes paths for the `/images`, `/labels`, `train.txt`, `test.txt`, and `backup`
+   + this includes paths for, `train.txt`, `validation.txt`, and `backup`
 + Modified `dams.cfg` (see above)
 + Image directory
-   + `/images`, path should be in `dams.data`
+   + `/images`, paths to each individual image should be in `train.txt` and `validation.txt`
 + Labels directory
    + `/labels`, path should be in `dams.data`
 + pretrained weights: `darknet53.conv.74`
@@ -69,3 +69,9 @@ wget https://pjreddie.com/media/files/darknet53.conv.74
 
 Run `./darknet detector train /path/to/dams.data /path/to/dams.cfg /path/to/weights`
 + Example: `./darknet detector train yolov3/dams.data yolov3/dams.cfg darknet53.conv.74`
+
+#### Outputs
++ Every 100 iterations, `dams_last.weights` will be saved to the `backup` directory listed in `dams.data `
++ Every 1000 iterations, `dams_xxxx.weights` will be saved to `backup` 
++ When training is complete, `dams_final.weights` 
+
