@@ -77,7 +77,8 @@ Important Information:
 + `darknet`recieves the architecture in the input `.cfg`. In this situation, `dams.cfg` provides a modified `yolov3.cfg` architecture for one class 
 
 #### Outputs
-+ Every 100 iterations, `dams_last.weights` checkpoint will be saved to the `backup` directory listed in `dams.data `
++ Every 100 iterations, `dams_last.weights` checkpoint will be saved to the `backup` directory listed in `dams.data`
+    + It is possible to stop training and then resume using `dams_last.weights` as the input weights
 + Every 1000 iterations, `dams_xxxx.weights` will be saved to `backup` 
 + When training is complete, `dams_final.weights` will be saved to `backup`
 
