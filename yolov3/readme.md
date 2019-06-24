@@ -81,7 +81,8 @@ Important Information:
     + To detect objects in an images, use `./darknet detect` instead
 + `darknet`recieves the architecture in the input `.cfg` file. In this case, `dams.cfg` provides a modified `yolov3.cfg` architecture for one class 
 + To track the loss after each training batch, include ` > /path/to/train.log` at the end of the training command above
-    + 
+    + Use `grep "avg" /path/to/train.log` to monitor the average loss and learning rate
+    + Once the learning rate reaches a small number (~0.0001), you could stop training
 
 #### Outputs
 + Every 100 iterations, `dams_last.weights` checkpoint will be saved to the `backup` directory listed in `dams.data`
