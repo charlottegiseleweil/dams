@@ -22,12 +22,14 @@ wget https://pjreddie.com/media/files/darknet53.conv.74
     + directory of dam images
     + directory of not_a_dam images
 + Outputs:
-    + `/images` directory with `/train` and `/test` subdirectories
-    + `/labels` directory with `/train` and `/test` subdirectories
+    + `/images` directory with `/train`, `/test`, `validation`, and `southaf` subdirectories
+    + `/labels` directory with `/train`, `/test`, `validation`, and `southaf` subdirectories
         + each label contains the mean x value, mean y value, width, and height of the bounding box in the corresponding image file
         + all numbers are normalized between 0 and 1
     + `test_images_filepaths.txt`
-    + `train_images_filepaths.txt`
+    + `valid_images_filepaths.txt`
+    + `test_images_filepaths.txt`
+    + `southaf_images_filepaths.txt`
     + `dams.names`
         + contains class names
     + `dams.data`
