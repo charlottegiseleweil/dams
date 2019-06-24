@@ -46,11 +46,19 @@ wget https://pjreddie.com/media/files/darknet53.conv.74
     + Line 696, set `classes=1`, we have one class (dams)
     + Line 776, set `filters=18`, filters = (number_of_classes + 5) * 3 
     + Line 783, set `classes=1`, we have one class (dams)
-    + we set 18 filters because each cell in YOLOv3 predicts 3 bounding boxes. Each bounding box has 5 + number_of_classes attributes (dimenions, objectness score, class confidence)
-+ You can also modify `max_batches=` on line 20 to limit the number of iterations. For only 1 class, 2000 should be the minumum for this, but many have put at least 4000 to be safe
+    + We set 18 filters because each cell in YOLOv3 predicts 3 bounding boxes. Each bounding box has 5 + number_of_classes attributes (dimenions, objectness score, class confidence)
+    + Only those three convolutional layers are modified because they are above a YOLO layer
++ IMPORTANT: You can also modify `max_batches=` on line 20 to limit the number of iterations. For only 1 class, 2000 should be the minumum for this, but many have put at least 4000 to be safe
     + This is because the learning rate usually decreases to 0.0001 at around 2000 * num_class iterations. 
 + Modify name of cfg file to `[run-date].cfg` to keep track of edits
-        
+
+#### Optional: Modify detector.c
+
++ You can also modify `detector.c` in `/darknet/examples` to create more checkpoints. The default setting is 1 every 100 iterations until the 1000th iteration, following by 1 every 10,000 iterations. To modify this to 1 every 1,000 iterations (or fewer):
+    + On Line 138, Change `if(i%10000==0 || (i < 1000 && i%100 == 0))` to `if(i%1000==0 || (i < 1000 && i%100 == 0))`
+        + (**10000** modified to **1000**)
+    + As detailed in https://www.learnopencv.com/training-yolov3-deep-learning-based-custom-object-detector/ (see Section 2.2)
+     
 ## Training Procedure
 
 #### Required files:
@@ -82,9 +90,10 @@ Important Information:
 + To train a model, use `./darknet detector train`
     + To detect objects in an images, use `./darknet detect` instead
 + `darknet`recieves the architecture in the input `.cfg` file. In this case, `[run-date].cfg` provides a modified `yolov3.cfg` architecture for one class 
-+ To track the loss after each training batch, include ` > /path/to/train.log` at the end of the training command above
++ To track the loss after each training batch, include ` > /path/to/train.log` at the end of the training command below
     + Use `grep "avg" /path/to/training_loss.log` to monitor the average loss and learning rate
     + Once the learning rate reaches a small number (~0.0001), you could stop training
+    + Source: https://www.learnopencv.com/training-yolov3-deep-learning-based-custom-object-detector/ (see Section 7)
     
 Run `./darknet detector train /path/to/[run-date].data /path/to/[run-date].cfg /path/to/weights`
 + Example: `./darknet detector train cfg/[run-date].data cfg/[run-date].cfg /darknet/darknet53.conv.74`
@@ -98,5 +107,5 @@ Run `./darknet detector train /path/to/[run-date].data /path/to/[run-date].cfg /
 
 #### Evaluation Metrics
 + Darknet currently does not compute mAP
-    + However, this fork of darknet does: https://github.com/AlexeyAB/darknet
+    + However, this fork of darknet does: https://github.com/AlexeyAB/darknet (See 'When Should I Stop Training')
 + Darknet does calculate recall and average loss, the latter of which can be monitored (see above: 'Important Information' under 'Train Model')
