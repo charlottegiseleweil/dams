@@ -1,4 +1,3 @@
-
 ## Installation Procedure
 
 Clone the darknet repository:
@@ -53,19 +52,22 @@ wget https://pjreddie.com/media/files/darknet53.conv.74
 ## Training Procedure
 
 #### Required files and directories:
-+ Classes
-   + `dams.names`
++ Classes (`dams.names`):
    + contains class names, there should be only one, dam
-+ Directory Paths
-   + `dams.data`
++ Directory Paths (`dams.data`):
    + contains directory paths for darknet
-   + this includes paths for, `train.txt`, `validation.txt`, and `backup`
+   + this includes paths for `train.txt`, `validation.txt`, and `backup`
+   + IMPORTANT: modify name of `dams.data` for each run, to keep track of past runs
+        + for example, `dams_06-24.data` or `dams_06-25.data`
 + Modified `dams.cfg` (see above)
+    + IMPORTANT: modify name of `dams.cfg` for each run, because the file names for the output weights are named after the input `.cfg` file
+        + for example, `dams_06-24.cfg` or `dams_06-25.cfg`
 + Image directory
    + `/images`, paths to each individual image should be in `train.txt` and `validation.txt`
 + Labels directory
-   + `/labels`, path should be in `dams.data`
-+ pretrained weights: `darknet53.conv.74`
+   + `/labels`, paths to each label should correspond to an image path
++ pre- trained weights: `darknet53.conv.74` (pre-trained on ImageNet)
+   + The weights will be different if you are resuming training you paused earlier. In this case, use the most recent OUTPUT of the training (the checkpoint): `dams_last.weights`
 
 #### Train model
 
