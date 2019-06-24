@@ -1,0 +1,5 @@
+classes = 1 
+ train = ../../../data/Darknet-inputs_imagery_6-7_made_6-21/training_set/training_image_filepaths.txt
+ valid = ../../../data/Darknet-inputs_imagery_6-7_made_6-21/validation_set/validation_image_filepaths.txt
+ names =  ../../../data/Darknet-inputs_imagery_6-7_made_6-21/dams.names
+ backup = ../../../outputs/yolo_06-24/

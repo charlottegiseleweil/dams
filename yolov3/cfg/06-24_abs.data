@@ -1,0 +1,5 @@
+classes = 1 
+ train = /home/adminatcap/charlie/data/Darknet-inputs_imagery_6-7_made_6-21/training_set/training_image_filepaths_abs.txt
+ valid = /home/adminatcap/charlie/data/Darknet-inputs_imagery_6-7_made_6-21/validation_set/validation_image_filepaths_abs.txt
+ names =  ~/charlie/repos/dams/yolov3/cfg/dams.names
+ backup = ~/charlie/outputs/yolo_06-24/
