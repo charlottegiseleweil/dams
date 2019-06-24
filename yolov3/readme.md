@@ -70,8 +70,15 @@ wget https://pjreddie.com/media/files/darknet53.conv.74
 Run `./darknet detector train /path/to/dams.data /path/to/dams.cfg /path/to/weights`
 + Example: `./darknet detector train yolov3/dams.data yolov3/dams.cfg darknet53.conv.74`
 
+Important Information:
++ `darknet` is an application written in C and CUDA
++ To train a model, use `./darknet detector train`
+    + To detect objects in an images, use `./darknet detect` instead
++ `darknet`
+
 #### Outputs
 + Every 100 iterations, `dams_last.weights` will be saved to the `backup` directory listed in `dams.data `
 + Every 1000 iterations, `dams_xxxx.weights` will be saved to `backup` 
-+ When training is complete, `dams_final.weights` 
++ When training is complete, `dams_final.weights` will be saved to `backup`
+
 
