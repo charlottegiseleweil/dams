@@ -1,4 +1,3 @@
-
 ## Installation Procedure
 
 Clone the darknet repository:
@@ -22,12 +21,14 @@ wget https://pjreddie.com/media/files/darknet53.conv.74
     + directory of dam images
     + directory of not_a_dam images
 + Outputs:
-    + `/images` directory with `/train` and `/test` subdirectories
-    + `/labels` directory with `/train` and `/test` subdirectories
+    + `/images` directory with `/train`, `/test`, `validation`, and `southaf` subdirectories
+    + `/labels` directory with `/train`, `/test`, `validation`, and `southaf` subdirectories
         + each label contains the mean x value, mean y value, width, and height of the bounding box in the corresponding image file
         + all numbers are normalized between 0 and 1
     + `test_images_filepaths.txt`
-    + `train_images_filepaths.txt`
+    + `valid_images_filepaths.txt`
+    + `test_images_filepaths.txt`
+    + `southaf_images_filepaths.txt`
     + `dams.names`
         + contains class names
     + `dams.data`
@@ -51,21 +52,36 @@ wget https://pjreddie.com/media/files/darknet53.conv.74
 ## Training Procedure
 
 #### Required files and directories:
-+ Classes
-   + `dams.names'`
++ Classes (`dams.names`):
    + contains class names, there should be only one, dam
-+ Directory Paths
-   + `dams.data`
++ Directory Paths (`dams.data`):
    + contains directory paths for darknet
-   + this includes paths for the `/images`, `/labels`, `train.txt`, `test.txt`, and `backup`
+   + this includes paths for `train.txt`, `validation.txt`, and `backup`
+   + IMPORTANT: modify name of `dams.data` for each run, to keep track of past runs
+        + for example, `dams_06-24.data` or `dams_06-25.data`
 + Modified `dams.cfg` (see above)
+    + IMPORTANT: modify name of `dams.cfg` for each run, because the file names for the output weights are named after the input `.cfg` file
+        + for example, `dams_06-24.cfg` or `dams_06-25.cfg`
 + Image directory
-   + `/images`, path should be in `dams.data`
+   + `/images`, paths to each individual image should be in `train.txt` and `validation.txt`
 + Labels directory
-   + `/labels`, path should be in `dams.data`
-+ pretrained weights: `darknet53.conv.74`
+   + `/labels`, paths to each label should correspond to an image path
++ pre- trained weights: `darknet53.conv.74` (pre-trained on ImageNet)
+   + The weights will be different if you are resuming training you paused earlier. In this case, use the most recent OUTPUT of the training (the checkpoint): `dams_last.weights`
 
 #### Train model
 
 Run `./darknet detector train /path/to/dams.data /path/to/dams.cfg /path/to/weights`
 + Example: `./darknet detector train yolov3/dams.data yolov3/dams.cfg darknet53.conv.74`
+
+Important Information:
++ `darknet` is an application written in C and CUDA
++ To train a model, use `./darknet detector train`
+    + To detect objects in an images, use `./darknet detect` instead
++ `darknet`recieves the architecture in the input `.cfg` file. In this case, `dams.cfg` provides a modified `yolov3.cfg` architecture for one class 
+
+#### Outputs
++ Every 100 iterations, `dams_last.weights` checkpoint will be saved to the `backup` directory listed in `dams.data`
+    + It is possible to stop training and then resume using `dams_last.weights` as the input weights
++ Every 1000 iterations, `dams_xxxx.weights` will be saved to `backup` 
++ When training is complete, `dams_final.weights` will be saved to `backup`
