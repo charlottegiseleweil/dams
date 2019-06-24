@@ -74,10 +74,10 @@ Important Information:
 + `darknet` is an application written in C and CUDA
 + To train a model, use `./darknet detector train`
     + To detect objects in an images, use `./darknet detect` instead
-+ `darknet`
++ `darknet`recieves the architecture in the input `.cfg`. In this situation, `dams.cfg` provides a modified `yolov3.cfg` architecture for one class 
 
 #### Outputs
-+ Every 100 iterations, `dams_last.weights` will be saved to the `backup` directory listed in `dams.data `
++ Every 100 iterations, `dams_last.weights` checkpoint will be saved to the `backup` directory listed in `dams.data `
 + Every 1000 iterations, `dams_xxxx.weights` will be saved to `backup` 
 + When training is complete, `dams_final.weights` will be saved to `backup`
 
