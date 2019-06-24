@@ -49,31 +49,31 @@ wget https://pjreddie.com/media/files/darknet53.conv.74
     + we set 18 filters because each cell in YOLOv3 predicts 3 bounding boxes. Each bounding box has 5 + number_of_classes attributes (dimenions, objectness score, class confidence)
 + You can also modify `max_batches=` on line 20 to limit the number of iterations. For only 1 class, 2000 should be the minumum for this, but many have put at least 4000 to be safe
     + This is because the learning rate usually decreases to 0.0001 at around 2000 * num_class iterations. 
-+ Modify name of cfg file to `[run_date].cfg` to keep track of edits
++ Modify name of cfg file to `[run-date].cfg` to keep track of edits
         
 ## Training Procedure
 
 #### Required files:
 + Classes (`dams.names`):
    + contains class names, there should be only one, dam
-+ Directory Paths (`[run_date].data`):
++ Directory Paths (`[run-date].data`):
    + contains directory paths for darknet
    + this includes paths for `train.txt`, `validation.txt`, and `backup`
-   + IMPORTANT: modify name of `[run_date].data` for each run, to keep track of past runs
+   + IMPORTANT: modify name of `[run-date].data` for each run, to keep track of past runs
         + for example, `06-24.data` or `06-25.data`
-+ Modified `[run_date].cfg` (see above)
-    + IMPORTANT: modify name of `[run_date].cfg` for each run, because the file names for the output weights are named after the input `.cfg` file
++ Modified `[run-date].cfg` (see above)
+    + IMPORTANT: modify name of `[run-date].cfg` for each run, because the file names for the output weights are named after the input `.cfg` file
         + for example, `06-24.cfg` or `06-25.cfg`
 + Image directory
    + `/images`, paths to each individual image should be in `train.txt` and `validation.txt`
 + Labels directory
    + `/labels`, paths to each label should correspond to an image path
 + pre- trained weights: `darknet53.conv.74` (pre-trained on ImageNet)
-   + The weights will be different if you are resuming training you paused earlier. In this case, use the most recent OUTPUT of the training (the checkpoint): `dams_last.weights`
+   + The weights will be different if you are resuming training you paused earlier. In this case, use the most recent OUTPUT of the training (the checkpoint): `run-date_last.weights`
    
 #### Required directories:
 + `/data` should contain the images, labels, `.txt` files, and `dams.names`
-+ `/cfg` should contain `[run_date].data` and `[run_date].cfg`
++ `/cfg` should contain `[run-date].data` and `[run-date].cfg`
 
 #### Train model
 
@@ -87,14 +87,14 @@ Important Information:
     + Once the learning rate reaches a small number (~0.0001), you could stop training
     
 Run `./darknet detector train /path/to/dams.data /path/to/dams.cfg /path/to/weights`
-+ Example: `./darknet detector train cfg/[run_date].data cfg/[run_date].cfg /darknet/darknet53.conv.74`
-+ To monitor loss: `./darknet detector train cfg/[run_date].data cfg/[run_date].cfg /darknet/darknet53.conv.74 > /path/to/outputs/training_loss.log`
++ Example: `./darknet detector train cfg/[run-date].data cfg/[run-date].cfg /darknet/darknet53.conv.74`
++ To monitor loss: `./darknet detector train cfg/[run-date].data cfg/[run-date].cfg /darknet/darknet53.conv.74 > /path/to/outputs/training_loss.log`
 
 #### Outputs
-+ Every 100 iterations, `dams_last.weights` checkpoint will be saved to the `backup` directory listed in `dams.data`
++ Every 100 iterations, `[run-date]_last.weights` checkpoint will be saved to the `backup` directory listed in `dams.data`
     + It is possible to stop training and then resume using `dams_last.weights` as the input weights
-+ Every 10000 iterations, `dams_xxxxx.weights` will be saved to `backup` 
-+ When training is complete, `dams_final.weights` will be saved to `backup`
++ Every 10000 iterations, `[run-date]_xxxxx.weights` will be saved to `backup` 
++ When training is complete, `[run-date]_final.weights` will be saved to `backup`
 
 #### Evaluation Metrics
 + Darknet currently does not compute mAP
