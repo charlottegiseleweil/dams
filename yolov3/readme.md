@@ -29,7 +29,7 @@ wget https://pjreddie.com/media/files/darknet53.conv.74
     + `valid_images_filepaths.txt`
     + `test_images_filepaths.txt`
     + `southaf_images_filepaths.txt`
-    + `dams.names`
+    + `[run-date].names`
         + contains class names
     + `[run_date].data`
         + contains directory information for darknet
@@ -81,21 +81,22 @@ Important Information:
 + `darknet` is an application written in C and CUDA
 + To train a model, use `./darknet detector train`
     + To detect objects in an images, use `./darknet detect` instead
-+ `darknet`recieves the architecture in the input `.cfg` file. In this case, `dams.cfg` provides a modified `yolov3.cfg` architecture for one class 
++ `darknet`recieves the architecture in the input `.cfg` file. In this case, `[run-date].cfg` provides a modified `yolov3.cfg` architecture for one class 
 + To track the loss after each training batch, include ` > /path/to/train.log` at the end of the training command above
     + Use `grep "avg" /path/to/training_loss.log` to monitor the average loss and learning rate
     + Once the learning rate reaches a small number (~0.0001), you could stop training
     
-Run `./darknet detector train /path/to/dams.data /path/to/dams.cfg /path/to/weights`
+Run `./darknet detector train /path/to/[run-date].data /path/to/[run-date].cfg /path/to/weights`
 + Example: `./darknet detector train cfg/[run-date].data cfg/[run-date].cfg /darknet/darknet53.conv.74`
 + To monitor loss: `./darknet detector train cfg/[run-date].data cfg/[run-date].cfg /darknet/darknet53.conv.74 > /path/to/outputs/training_loss.log`
 
 #### Outputs
-+ Every 100 iterations, `[run-date]_last.weights` checkpoint will be saved to the `backup` directory listed in `dams.data`
-    + It is possible to stop training and then resume using `dams_last.weights` as the input weights
++ Every 100 iterations, `[run-date]_last.weights` checkpoint will be saved to the `backup` directory listed in `[run-date].data`
+    + It is possible to stop training and then resume using `[run-date]_last.weights` as the input weights
 + Every 10000 iterations, `[run-date]_xxxxx.weights` will be saved to `backup` 
 + When training is complete, `[run-date]_final.weights` will be saved to `backup`
 
 #### Evaluation Metrics
 + Darknet currently does not compute mAP
     + However, this fork of darknet does: https://github.com/AlexeyAB/darknet
++ Darknet does calculate recall and average loss, the latter of which can be monitored (see above: 'Important Information' under 'Train Model')
