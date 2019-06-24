@@ -60,10 +60,10 @@ wget https://pjreddie.com/media/files/darknet53.conv.74
    + contains directory paths for darknet
    + this includes paths for `train.txt`, `validation.txt`, and `backup`
    + IMPORTANT: modify name of `[run_date].data` for each run, to keep track of past runs
-        + for example, `dams_06-24.data` or `dams_06-25.data`
+        + for example, `06-24.data` or `06-25.data`
 + Modified `[run_date].cfg` (see above)
     + IMPORTANT: modify name of `[run_date].cfg` for each run, because the file names for the output weights are named after the input `.cfg` file
-        + for example, `dams_06-24.cfg` or `dams_06-25.cfg`
+        + for example, `06-24.cfg` or `06-25.cfg`
 + Image directory
    + `/images`, paths to each individual image should be in `train.txt` and `validation.txt`
 + Labels directory
@@ -95,3 +95,7 @@ Run `./darknet detector train /path/to/dams.data /path/to/dams.cfg /path/to/weig
     + It is possible to stop training and then resume using `dams_last.weights` as the input weights
 + Every 10000 iterations, `dams_xxxxx.weights` will be saved to `backup` 
 + When training is complete, `dams_final.weights` will be saved to `backup`
+
+#### Evaluation Metrics
++ Darknet currently does not compute mAP
+    + However, this fork of darknet does: https://github.com/AlexeyAB/darknet
