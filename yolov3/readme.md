@@ -47,6 +47,7 @@ wget https://pjreddie.com/media/files/darknet53.conv.74
     + Line 776, set `filters=18`, filters = (number_of_classes + 5) * 3 
     + Line 783, set `classes=1`, we have one class (dams)
     + we set 18 filters because each cell in YOLOv3 predicts 3 bounding boxes. Each bounding box has 5 + number_of_classes attributes (dimenions, objectness score, class confidence)
++ You can also modify `max_batches=` on line 20 to limit the number of iterations. For only 1 class, 2000 should be the minumum for this, but many have put at least 4000 to be safe
 + Modify name of cfg file to keep track of edits
         
 ## Training Procedure
@@ -79,9 +80,11 @@ Important Information:
 + To train a model, use `./darknet detector train`
     + To detect objects in an images, use `./darknet detect` instead
 + `darknet`recieves the architecture in the input `.cfg` file. In this case, `dams.cfg` provides a modified `yolov3.cfg` architecture for one class 
++ To track the loss after each training batch, include ` > /path/to/train.log` at the end of the training command above
+    + 
 
 #### Outputs
 + Every 100 iterations, `dams_last.weights` checkpoint will be saved to the `backup` directory listed in `dams.data`
     + It is possible to stop training and then resume using `dams_last.weights` as the input weights
-+ Every 1000 iterations, `dams_xxxx.weights` will be saved to `backup` 
++ Every 10000 iterations, `dams_xxxxx.weights` will be saved to `backup` 
 + When training is complete, `dams_final.weights` will be saved to `backup`
