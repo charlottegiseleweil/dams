@@ -1,0 +1,5 @@
+classes=1
+train=/home/adminatcap/charlie/data/YOLOready_imagery_6-7_made_6-21/training_set/training_set_image_filepaths_abs.txt
+valid=/home/adminatcap/charlie/data/YOLOready_imagery_6-7_made_6-21/validation_set/validation_set_image_filepaths_abs.txt
+names=/home/adminatcap/charlie/repos/dams/yolov3/dams.names
+backup=/home/adminatcap/charlie/outputs/YOLOrun_6-25_on_imagery_6-7_maanas/
