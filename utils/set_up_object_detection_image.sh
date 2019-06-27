@@ -9,7 +9,7 @@ cd /lib/tf ## change to INSTALL_DIR !
 git clone https://github.com/tensorflow/models
 cd models
 git reset --hard 8367cf6dabe11adf7628541706b660821f397dce
-cd ..
+cd .. 
 
 git clone https://github.com/cocodataset/cocoapi.git
 cd cocoapi/PythonAPI
