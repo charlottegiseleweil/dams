@@ -1,0 +1,7 @@
+/home/adminatcap/charlie/data/Darknet-inputs_imagery_6-7_made_6-21/validation_set/images/70116_clipped.png
+/home/adminatcap/charlie/data/Darknet-inputs_imagery_6-7_made_6-21/validation_set/images/70119_clipped.png
+/home/adminatcap/charlie/data/Darknet-inputs_imagery_6-7_made_6-21/validation_set/images/2569_clipped.png
+/home/adminatcap/charlie/data/Darknet-inputs_imagery_6-7_made_6-21/validation_set/images/100375_clipped.png
+/home/adminatcap/charlie/data/Darknet-inputs_imagery_6-7_made_6-21/validation_set/images/14148_clipped.png
+/home/adminatcap/charlie/data/Darknet-inputs_imagery_6-7_made_6-21/validation_set/images/6918_clipped.png
+/home/adminatcap/charlie/data/Darknet-inputs_imagery_6-7_made_6-21/validation_set/images/5902_clipped.png
