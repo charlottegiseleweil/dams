@@ -104,9 +104,14 @@ Calculating mAP: 100%|███████████████████�
 ## Detection Procedure
 +	Create subdirectory `/detect_yolov3_[run_date]` of images to run the trained model on
 +	Navigate back to your ultralytics repo
-  +	Run:
+    +	Run:
   ```
   python3 detect.py --cfg ../dams/yolov3/[run-date].cfg –data-cfg ../dams/yolov3/[run-date].data --weights ../../outputs/train_yolov3_[run-date]_ultralytics/best.pt --images /path/to/detect_yolov3_[run-date] --output ../../output/detected_yolov3[run_date]
   ```
-
- 
++ Check `/detected_yolov3[run_date]` to ensure output images were produced
+   + These images should have predicted bounding boxes with the 'dam' label (if there is a dam in the image)
++ Compare predicted boxes with ground truth boxes, open `Visualize_ultralytics_results.ipynb`
++ Set the paths to `/detected_yolov3[run_date]` for `INPUT_DIR` and to the labels directory for `LABEL_DIR`
++ Run the remaining cells 
+    + Fourth cell outputs comparison boxes
+    + Ground truth boxes are in blue, predicted boxes are in another color
