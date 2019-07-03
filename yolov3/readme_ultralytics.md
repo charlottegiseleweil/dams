@@ -70,11 +70,43 @@
     + Every 10 epochs, `backup[x]0.pt` is output
     + Weights with the highest mAP is output under `best.pt`
     + Weights from the most recent epoch is output under `latest.pt`
-    + Navigate to the clone ultralytics repo to view `results.txt`
-        + Second column from right contains mAP, as defined in `pycocotools`
-        + Third column from right contains recall, as defined in `pycocotools`
-        + Fourth column from right contains precision, as defined in `pycocotools`
-    + <b>IMPORTANT<b>: Move all outputs to `~/charlie/outputs/[run_name]/` to avoid being overwritten during the next run
+    + Navigate to the cloned ultralytics repo to view `results.txt`
+        + Third column from right contains mAP, as defined in COCO evaluation metrics
+        + Fourth column from right contains recall, as defined in COCO evaluation metrics
+        + Fifth column from right contains precision, as defined in COCO evaluation metrics
+    + IMPORTANT: Move all outputs to `~/charlie/outputs/train_yolov3_[run-date]_ultralytics/` to avoid being overwritten during the next run
 
+## Evaluation Procedure
++ `test.py` computes all COCO evaluation metrics
++ Run:
+    + `python3 test.py --cfg ../dams/yolov3/cfg/[run-date].cfg --data-cfg ../dams/yolov3/cfg/[run-date].data --weights ../../outputs/train_yolov3_[run-date]_ultralytics/best.pt`
+    + `best.py` are the weights from the epoch with the highest mAP (@IoU0.5)
++ Results should be displayed to command line (example from ultralytics' github repo):
 
+```
+Class    Images   Targets         P         R       mAP        F1
+Calculating mAP: 100%|█████████████████████████████████████████| 157/157 [05:59<00:00,  1.71s/it]
+                 all     5e+03  3.58e+04     0.109     0.773      0.57     0.186
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.335
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.565
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.349
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.151
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.360
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.493
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.280
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.432
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.458
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.255
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.494
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.620
+ ```
+ 
+## Detection Procedure
++	Create subdirectory `/detect_yolov3_[run_date]` of images to run the trained model on
++	Navigate back to your ultralytics repo
+  +	Run:
+  ```
+  python3 detect.py --cfg ../dams/yolov3/[run-date].cfg –data-cfg ../dams/yolov3/[run-date].data --weights ../../outputs/train_yolov3_[run-date]_ultralytics/best.pt --images /path/to/detect_yolov3_[run-date] --output ../../output/detected_yolov3[run_date]
+  ```
 
+ 
