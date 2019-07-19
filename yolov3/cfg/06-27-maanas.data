@@ -1,0 +1,5 @@
+classes=1
+train=/home/adminatcap/charlie/data/PyTorchYOLOready_imagery_6-7-subset_made_6-26/images/images/test_filepaths.txt
+valid=/home/adminatcap/charlie/data/PyTorchYOLOready_imagery_6-7-subset_made_6-26/images/images/train_filepaths.txt
+names=/home/adminatcap/charlie/repos/dams/yolov3/cfg/dams-empty-line.names
+backup=/home/adminatcap/charlie/outputs/YOLOrun_6-27_on_imagery_6-7-subset_maanas/
