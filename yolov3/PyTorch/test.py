@@ -11,6 +11,7 @@ import time
 import datetime
 import argparse
 import tqdm
+import time
 
 import torch
 from torch.utils.data import DataLoader
@@ -42,10 +43,13 @@ def evaluate(model, path, iou_thres, conf_thres, nms_thres, img_size, batch_size
         targets[:, 2:] *= img_size
 
         imgs = Variable(imgs.type(Tensor), requires_grad=False)
-
-        with torch.no_grad():
-            outputs = model(imgs)
-            outputs = non_max_suppression(outputs, conf_thres=conf_thres, nms_thres=nms_thres)
+        
+        now = time.time()
+        future = time + 10
+        while time.time() < future:
+            with torch.no_grad():
+                outputs = model(imgs)
+                outputs = non_max_suppression(outputs, conf_thres=conf_thres, nms_thres=nms_thres)        
 
         sample_metrics += get_batch_statistics(outputs, targets, iou_threshold=iou_thres)
 
