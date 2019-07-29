@@ -1,0 +1,5 @@
+classes = 1 
+ train = ../../../data/yolov3-inputs_imagery-7-25_cropped_419/training_set/training_image_filepaths.txt
+ valid = ../../../data/yolov3-inputs_imagery-7-25_cropped_419/validation_set/validation_image_filepaths.txt
+ names =  ../../../data/yolov3-inputs_imagery-7-25_cropped_419/dams.names
+ backup = ../../../outputs/yolov3-outputs_7-29_cropped_419/
