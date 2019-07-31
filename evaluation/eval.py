@@ -8,9 +8,9 @@ from copy import deepcopy
 
 # inputs
 parser = argparse.ArgumentParser(description='Custom COCO metrics')
-parser.add_argument('--images', type=str, default='../../outputs/detection-results/images', help='directory of images output from detect.py')
-parser.add_argument('--predicted_bboxes', type=str, default='../../outputs/detection-results/pred', help='directory of .txt files of predicted bounding boxes')
-parser.add_argument('--ground_truth_bboxes', type=str, default='../../outputs/detection-results/truth')
+parser.add_argument('--images', type=str, default='../../../../outputs/detection-results/images', help='directory of images output from detect.py')
+parser.add_argument('--predicted_bboxes', type=str, default='../../../../outputs/detection-results/pred', help='directory of .txt files of predicted bounding boxes')
+parser.add_argument('--ground_truth_bboxes', type=str, default='../../../../outputs/detection-results/truth')
 parser.add_argument('--iou_thres', type=float, default=0.5, help='IoU threshold for mAP calculation')
 parser.add_argument('--size_thres', type=str, default='32,96', help='threshold for size categories (input for COCO categories would be: 32,96)')
 # use tuple
@@ -19,7 +19,6 @@ args = parser.parse_args()
 print(args)
 
 # set directory paths
-print(args.images)
 images_dir = os.path.join(args.images)
 pred_bbox_dir = os.path.join(args.predicted_bboxes)
 gt_bbox_dir = os.path.join(args.ground_truth_bboxes)
@@ -36,59 +35,63 @@ lim_small = int(size_thres.split(',')[0]) ** 2
 lim_medium = int(size_thres.split(',')[1]) ** 2
 image_size = args.image_size
 
+# function to parse predicted bounding box txt files for min/max values
 def parse_pred_bbox (label_fp):
-    """Obtain x_min, y_min, x_max, and y_max of bounding box from txt file
-    Args:
-        label_fp (str): filepath to bounding box .txt file in detect.py output format
-    Returns:
-        coords (list of list)
-    """
-    with open(label_fp, 'r') as label:
-        line = str(label.readline())
-        vals = line.split(' ')
-        x_min = int(vals[0])
-        y_min = int(vals[1])
-        x_max = int(vals[2])
-        y_max = int(vals[3])
-    coords = [[x_min, y_min, x_max, y_max]]
-    return coords
+	"""Obtain x_min, y_min, x_max, and y_max of bounding box from txt file
+	Args:
+		label_fp (str): filepath to bounding box .txt file in detect.py output format
+	Returns:
+		coords (list of list)
+	"""
+	with open(label_fp, 'r') as label:
+		line = str(label.readline())
+		vals = line.split(' ')
+		x_min = int(vals[0])
+		y_min = int(vals[1])
+		x_max = int(vals[2])
+		y_max = int(vals[3])
+	coords = [[x_min, y_min, x_max, y_max]]
+	return coords
 
+# function to parse predicted bounding box txt files for confidence level
 def parse_pred_box_conf (label_fp):
-    """Obtain confidence score of bounding box from .txt file
-    Args:
-        label_fp (str): filepath to bounding box .txt file in detect.py output format
-    Returns:
-        coords (list of list)
-    """
-    with open(label_fp, 'r') as label:
-        line = str(label.readline())
-        vals = line.split(' ')
-        conf = float(vals[5])
-        conf = [float('%.4f'%(conf))]
-    return conf
+	"""Obtain confidence score of bounding box from .txt file
+	Args:
+		label_fp (str): filepath to bounding box .txt file in detect.py output format
+	Returns:
+		coords (list of list)
+	"""
+	with open(label_fp, 'r') as label:
+		line = str(label.readline())
+		vals = line.split(' ')
+		conf = float(vals[5])
+		conf = [float('%.4f'%(conf))]
+	return conf
 
+# function to parse ground truth bounding box txt files for min/max values
 def parse_gt_bbox (label_fp):
-    """Obtain confidence score of bounding box from .txt file
-    Args:
-        label_fp (str): filepath to bounding box .txt file in darknet input format
-    Returns:
-        coords (list of list)
-    """
-    with open(label_fp, 'r') as label_txt:
-        line = label_txt.readline()
-        norm_x = float(line[2:10])
-        norm_y = float(line[11:19])
-        norm_w = float(line[20:28])
-        norm_h = float(line[29:])
-        x_min = int((norm_x * image_size) - ((norm_w * image_size) / 2))
-        y_min = int((norm_y * image_size) - ((norm_h * image_size) / 2))
-        x_max = int((norm_x * image_size) + ((norm_w * image_size) / 2))
-        y_max = int((norm_y * image_size) + ((norm_h * image_size) / 2))
-    coords = [[x_min, y_min, x_max, y_max]]
-    return coords
+	"""Obtain confidence score of bounding box from .txt file
+	Args:
+		label_fp (str): filepath to bounding box .txt file in darknet input format
+	Returns:
+		coords (list of list)
+	"""
+	with open(label_fp, 'r') as label_txt:
+		line = label_txt.readline()
+		norm_x = float(line[2:10])
+		norm_y = float(line[11:19])
+		norm_w = float(line[20:28])
+		norm_h = float(line[29:])
+		x_min = int((norm_x * image_size) - ((norm_w * image_size) / 2))
+		y_min = int((norm_y * image_size) - ((norm_h * image_size) / 2))
+		x_max = int((norm_x * image_size) + ((norm_w * image_size) / 2))
+		y_max = int((norm_y * image_size) + ((norm_h * image_size) / 2))
+	coords = [[x_min, y_min, x_max, y_max]]
+	return coords
 
+# function to calculate IoU from bboxes in np.array format
 def calc_IoU (ground_truth, predicted):
-    """Calculate IoU of single predicted and ground truth box
+	"""Calculate IoU of single predicted and ground truth box
     Args:
         pred_box (list of floats): location of predicted object as
             [xmin, ymin, xmax, ymax]
@@ -97,57 +100,57 @@ def calc_IoU (ground_truth, predicted):
     Returns:
         float: value of the IoU for the two boxes.
     """
-    # gather gt and pred coords
-    x1_t, y1_t, x2_t, y2_t = ground_truth[0]
-    x1_p, y1_p, x2_p, y2_p = predicted[0]
-    # find extremes
-    far_x = np.min([x2_t, x2_p])
-    near_x = np.max([x1_t, x1_p])
-    far_y = np.min([y2_t, y2_p])
-    near_y = np.max([y1_t, y1_p])
-    # calc areas
-    inter_area = (far_x - near_x + 1) * (far_y - near_y + 1)
-    gt_box_area = (x2_t - x1_t + 1) * (y2_t - y1_t + 1)
-    pred_box_area = (x2_p - x1_p + 1) * (y2_p - y1_p + 1)
-    # calc IoU
-    iou = inter_area / (gt_box_area + pred_box_area - inter_area)
-    iou = float('%.4f'%(iou))
-    return iou
+	# gather gt and pred coords
+	x1_t, y1_t, x2_t, y2_t = ground_truth[0]
+	x1_p, y1_p, x2_p, y2_p = predicted[0]
+	# find extremes
+	far_x = np.min([x2_t, x2_p])
+	near_x = np.max([x1_t, x1_p])
+	far_y = np.min([y2_t, y2_p])
+	near_y = np.max([y1_t, y1_p])
+	# calc areas
+	inter_area = (far_x - near_x + 1) * (far_y - near_y + 1)
+	gt_box_area = (x2_t - x1_t + 1) * (y2_t - y1_t + 1)
+	pred_box_area = (x2_p - x1_p + 1) * (y2_p - y1_p + 1)
+	# calc IoU
+	iou = inter_area / (gt_box_area + pred_box_area - inter_area)
+	iou = float('%.4f'%(iou))
+	return iou
 
 # function to calculate IoU from bboxes in np.array format
 def calc_IoUa (ground_truth, predicted):
-    # gather gt and pred coords
-    x1_t, y1_t, x2_t, y2_t = ground_truth
-    x1_p, y1_p, x2_p, y2_p = predicted
-    # find extremes
-    far_x = np.min([x2_t, x2_p])
-    near_x = np.max([x1_t, x1_p])
-    far_y = np.min([y2_t, y2_p])
-    near_y = np.max([y1_t, y1_p])
-    # calc areas
-    inter_area = (far_x - near_x + 1) * (far_y - near_y + 1)
-    gt_box_area = (x2_t - x1_t + 1) * (y2_t - y1_t + 1)
-    pred_box_area = (x2_p - x1_p + 1) * (y2_p - y1_p + 1)
-    # calc IoU
-    iou = inter_area / (gt_box_area + pred_box_area - inter_area)
-    iou = float('%.4f'%(iou))
-    return iou
+	# gather gt and pred coords
+	x1_t, y1_t, x2_t, y2_t = ground_truth
+	x1_p, y1_p, x2_p, y2_p = predicted
+	# find extremes
+	far_x = np.min([x2_t, x2_p])
+	near_x = np.max([x1_t, x1_p])
+	far_y = np.min([y2_t, y2_p])
+	near_y = np.max([y1_t, y1_p])
+	# calc areas
+	inter_area = (far_x - near_x + 1) * (far_y - near_y + 1)
+	gt_box_area = (x2_t - x1_t + 1) * (y2_t - y1_t + 1)
+	pred_box_area = (x2_p - x1_p + 1) * (y2_p - y1_p + 1)
+	# calc IoU
+	iou = inter_area / (gt_box_area + pred_box_area - inter_area)
+	iou = float('%.4f'%(iou))
+	return iou
 
 def get_model_conf_map (pred_boxes):
-    """Creates a dictionary of from model_scores to image ids.
-    Args:
-        pred_boxes (dict): dict of dicts of 'boxes' and 'scores'
-    Returns:
-        dict: keys are model_scores and values are image ids (usually filenames)
-    """
-    model_conf_map = {}
-    for img_id, val in pred_boxes.items():
-        for conf in val['conf']:
-            if conf not in model_conf_map.keys():
-                model_conf_map[conf] = [img_id]
-            else:
-                model_conf_map[conf].append(img_id)
-    return model_conf_map
+	"""Creates a dictionary of from model_scores to image ids.
+	Args:
+		pred_boxes (dict): dict of dicts of 'boxes' and 'scores'
+	Returns:
+		dict: keys are model_scores and values are image ids (usually filenames)
+	"""
+	model_conf_map = {}
+	for img_id, val in pred_boxes.items():
+		for conf in val['conf']:
+			if conf not in model_conf_map.keys():
+				model_conf_map[conf] = [img_id]
+			else:
+				model_conf_map[conf].append(img_id)
+	return model_conf_map
 
 def get_single_image_results (gt_boxes, pred_boxes, iou_thr):
     """Calculates number of true_pos, false_pos, false_neg from single batch of boxes.
@@ -172,7 +175,7 @@ def get_single_image_results (gt_boxes, pred_boxes, iou_thr):
         tp = 0
         fp = len(pred_boxes)
         fn = 0
-        return {'true_pos': tp, 'false_pos': fp, 'false_neg': fn}   
+        return {'true_pos': tp, 'false_pos': fp, 'false_neg': fn}	
     gt_idx_thr = []
     pred_idx_thr = []
     ious = []
@@ -214,12 +217,12 @@ def calc_precision_recall (img_results):
     true_pos = 0; false_pos = 0; false_neg = 0
     for _, res in img_results.items():
         if res is None:
-            precision = 0.0
-            recall = 0.0
+        	precision = 0.0
+        	recall = 0.0
         else:
-            true_pos += res['true_pos']
-            false_pos += res['false_pos']
-            false_neg += res['false_neg']
+        	true_pos += res['true_pos']
+        	false_pos += res['false_pos']
+        	false_neg += res['false_neg']
     try:
         precision = true_pos/(true_pos + false_pos)
     except ZeroDivisionError:
@@ -267,21 +270,21 @@ def get_avg_precision_at_iou(gt_boxes, pred_boxes, iou_thr):
         # On first iteration, define img_results for the first time:
         img_ids = gt_boxes.keys() if ithr == 0 else model_conf_map[model_conf_thr]
         for img_id in img_ids:
-            if img_id not in pred_boxes_pruned.keys():
-                img_results[img_id] = {'true_pos': 0, 'false_pos': 0, 'false_neg': 1}
-            else:
-                gt_boxes_img = gt_boxes[img_id]
-                box_conf = pred_boxes_pruned[img_id]['conf']
-                start_idx = 0
-                for conf in box_conf:
-                    if conf <= model_conf_thr:
-                        pred_boxes_pruned[img_id]
-                        start_idx += 1
-                    else:
-                        break
-                pred_boxes_pruned[img_id]['conf'] = pred_boxes_pruned[img_id]['conf'][start_idx:]
-                pred_boxes_pruned[img_id]['predicted'] = pred_boxes_pruned[img_id]['predicted'][start_idx:]
-                img_results[img_id] = get_single_image_results(gt_boxes_img, pred_boxes_pruned[img_id]['predicted'], iou_thr)
+        	if img_id not in pred_boxes_pruned.keys():
+        		img_results[img_id] = {'true_pos': 0, 'false_pos': 0, 'false_neg': 1}
+        	else:
+        		gt_boxes_img = gt_boxes[img_id]
+        		box_conf = pred_boxes_pruned[img_id]['conf']
+        		start_idx = 0
+        		for conf in box_conf:
+        			if conf <= model_conf_thr:
+        				pred_boxes_pruned[img_id]
+        				start_idx += 1
+        			else:
+        				break
+        		pred_boxes_pruned[img_id]['conf'] = pred_boxes_pruned[img_id]['conf'][start_idx:]
+        		pred_boxes_pruned[img_id]['predicted'] = pred_boxes_pruned[img_id]['predicted'][start_idx:]
+        		img_results[img_id] = get_single_image_results(gt_boxes_img, pred_boxes_pruned[img_id]['predicted'], iou_thr)
         prec, rec = calc_precision_recall(img_results)
         precisions.append(prec)
         recalls.append(rec)
@@ -307,16 +310,16 @@ def get_avg_precision_at_iou(gt_boxes, pred_boxes, iou_thr):
 # create dictionaries of ground_truth and predicted bounding boxes
 ground_truth_dict = {}
 for fn in gt_bbox_fn:
-    bbox = parse_gt_bbox(os.path.join(gt_bbox_dir, fn))
-    ground_truth_dict[fn.replace('.txt', '.png')] = bbox
+	bbox = parse_gt_bbox(os.path.join(gt_bbox_dir, fn))
+	ground_truth_dict[fn.replace('.txt', '.png')] = bbox
 predicted_dict = {}
 for fn in pred_bbox_fn:
-    bbox = parse_pred_bbox(os.path.join(pred_bbox_dir, fn))
-    predicted_dict[fn.replace('.txt', '.png')] = bbox
+	bbox = parse_pred_bbox(os.path.join(pred_bbox_dir, fn))
+	predicted_dict[fn.replace('.txt', '.png')] = bbox
 conf_dict = {}
 for fn in pred_bbox_fn:
-    conf = parse_pred_box_conf(os.path.join(pred_bbox_dir, fn))
-    conf_dict[fn.replace('.txt', '.png')] = conf
+	conf = parse_pred_box_conf(os.path.join(pred_bbox_dir, fn))
+	conf_dict[fn.replace('.txt', '.png')] = conf
 
 # build dataframe of image, ground_truth bboxes, predicted bboxes, and confidence
 data = {'image' : image_fn}
@@ -327,15 +330,15 @@ detect_df['conf'] = detect_df['image'].map(pd.Series(conf_dict))
 
 # add ground_truth bbox size to dataframe
 detect_df['size'] = detect_df.apply(
-    lambda row: int((row.ground_truth[0][2] - row.ground_truth[0][0]) * (row.ground_truth[0][3] - row.ground_truth[0][1])), 
-    axis=1
+	lambda row: int((row.ground_truth[0][2] - row.ground_truth[0][0]) * (row.ground_truth[0][3] - row.ground_truth[0][1])), 
+	axis=1
 )
 
 # add IoU to dataframe
 iou_dict = {}
 for fn in predicted_dict:
-    iou = calc_IoU(ground_truth_dict[fn], predicted_dict[fn])
-    iou_dict[fn] = iou
+	iou = calc_IoU(ground_truth_dict[fn], predicted_dict[fn])
+	iou_dict[fn] = iou
 detect_df['iou'] = detect_df['image'].map(pd.Series(iou_dict))
 
 # create input jsons to calculate mAP
