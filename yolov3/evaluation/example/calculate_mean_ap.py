@@ -222,7 +222,6 @@ def get_avg_precision_at_iou(gt_boxes, pred_boxes, iou_thr=0.5):
         pred_boxes[img_id]['boxes'] = np.array(pred_boxes[img_id]['boxes'])[arg_sort].tolist()
 
     pred_boxes_pruned = deepcopy(pred_boxes)
-
     precisions = []
     recalls = []
     model_thrs = []
@@ -300,7 +299,6 @@ if __name__ == "__main__":
 
     with open('predicted_boxes.json') as infile:
         pred_boxes = json.load(infile)
-
     # Runs it for one IoU threshold
     iou_thr = 0.7
     start_time = time.time()
