@@ -99,6 +99,21 @@ def calc_precision_and_recall (df):
 	p_r_dict = {'precision':precision, 'recall':recall}
 	return p_r_dict
 
+# function to create a dictionary from model_scores to image_ids
+def get_model_scores_map (pred_conf_dict):
+	model_scores_map = {}
+	for img_id, val in pred_conf_dict.items():
+		for confidence in val['conf']:
+			if score not in model_scores_map.keys():
+				model_scores_map[score] = [img_id]
+			else:
+				model_scores_map[score].append(img_id)
+
+# function to calculate mAP for input dataframe (with same columns as detect_df)
+def calc_mAP (ground_truth_dict, predicted_dict):
+	model_scores_map = get_model_scores_map(pred_conf_dict)
+	sorted_model_scores = sorted(model_scores_map.keys())
+
 # create dictionaries of ground_truth and predicted bounding boxes
 ground_truth_dict = {}
 for fn in gt_bbox_fn:
@@ -132,7 +147,6 @@ for fn in predicted_dict:
 	iou = calc_IoU(ground_truth_dict[fn], predicted_dict[fn])
 	iou_dict[fn] = iou
 detect_df['iou'] = detect_df['image'].map(pd.Series(iou_dict))
-#detect_df = detect_df.fillna(0)
 print(detect_df)
 
 # split dataframe by size threholds
@@ -145,5 +159,9 @@ detect_iou_df = detect_df[detect_df['iou'] >= iou_thres]
 
 # calculate precision and recall
 p_r = calc_precision_and_recall(detect_df)
-
 print(p_r)
+
+# TODOS
+#	- plot precision-recall curve 
+#	- calculate area under curve (mAP)
+#	- visualize using notebook for test/debug purposes
