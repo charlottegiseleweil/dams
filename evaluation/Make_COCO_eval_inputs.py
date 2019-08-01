@@ -78,21 +78,23 @@ for fn in pred_bbox_fn:
     pred_conf_list.append(conf)
     pred_classes_list.append(arr0)
 
+# prepare ground_truth input for COCOWrapper
 groundtruth_dict = coco_tools.ExportGroundtruthToCOCO(
     gt_img_ids, 
     gt_bboxes_list, 
     gt_classes_list,
     1, 
-    output_path=None
 )    
 
+# prepare detections input for COCOWrapper
 detections_list = coco_tools.ExportDetectionsToCOCO(
     pred_img_ids, 
     pred_bboxes_list, 
     pred_conf_list, 
     pred_classes_list, 
-    output_path=None
 ) 
+
+# calculate
 groundtruth = coco_tools.COCOWrapper(groundtruth_dict)
 detections = groundtruth.LoadAnnotations(detections_list)
 evaluator = coco_tools.COCOEvalWrapper(groundtruth, detections, agnostic_mode=False)
