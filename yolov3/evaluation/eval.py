@@ -8,9 +8,9 @@ from copy import deepcopy
 
 # inputs
 parser = argparse.ArgumentParser(description='Custom COCO metrics')
-parser.add_argument('--images', type=str, default='../../outputs/detection-results/images', help='directory of images output from detect.py')
-parser.add_argument('--predicted_bboxes', type=str, default='../../outputs/detection-results/pred', help='directory of .txt files of predicted bounding boxes')
-parser.add_argument('--ground_truth_bboxes', type=str, default='../../outputs/detection-results/truth')
+parser.add_argument('--images', type=str, default='../../../../outputs/detection-results/images', help='directory of images output from detect.py')
+parser.add_argument('--predicted_bboxes', type=str, default='../../../../outputs/detection-results/pred', help='directory of .txt files of predicted bounding boxes')
+parser.add_argument('--ground_truth_bboxes', type=str, default='../../../../outputs/detection-results/truth')
 parser.add_argument('--iou_thres', type=float, default=0.5, help='IoU threshold for mAP calculation')
 parser.add_argument('--size_thres', type=str, default='32,96', help='threshold for size categories (input for COCO categories would be: 32,96)')
 # use tuple
@@ -19,7 +19,6 @@ args = parser.parse_args()
 print(args)
 
 # set directory paths
-print(args.images)
 images_dir = os.path.join(args.images)
 pred_bbox_dir = os.path.join(args.predicted_bboxes)
 gt_bbox_dir = os.path.join(args.ground_truth_bboxes)
@@ -36,6 +35,7 @@ lim_small = int(size_thres.split(',')[0]) ** 2
 lim_medium = int(size_thres.split(',')[1]) ** 2
 image_size = args.image_size
 
+# combine pred bbox and 
 def parse_pred_bbox (label_fp):
     """Obtain x_min, y_min, x_max, and y_max of bounding box from txt file
     Args:
@@ -87,6 +87,7 @@ def parse_gt_bbox (label_fp):
     coords = [[x_min, y_min, x_max, y_max]]
     return coords
 
+# 
 def calc_IoU (ground_truth, predicted):
     """Calculate IoU of single predicted and ground truth box
     Args:
@@ -232,6 +233,9 @@ def calc_precision_recall (img_results):
 
 def get_avg_precision_at_iou(gt_boxes, pred_boxes, iou_thr):
     """Calculates average precision at given IoU threshold.
+
+    error -> should be dict 
+
     Args:
         gt_boxes (list of list of floats): list of locations of ground truth
             objects as [xmin, ymin, xmax, ymax]
@@ -332,6 +336,7 @@ detect_df['size'] = detect_df.apply(
 )
 
 # add IoU to dataframe
+# not a dam needs to be accounted for 
 iou_dict = {}
 for fn in predicted_dict:
     iou = calc_IoU(ground_truth_dict[fn], predicted_dict[fn])
@@ -339,6 +344,7 @@ for fn in predicted_dict:
 detect_df['iou'] = detect_df['image'].map(pd.Series(iou_dict))
 
 # create input jsons to calculate mAP
+# description
 detect_df = detect_df.set_index('image')
 pred_df_a = detect_df[detect_df['predicted'].notnull()]
 pred_df_b = pred_df_a[['predicted', 'conf']]
@@ -346,6 +352,10 @@ pred_json_str = pred_df_b.to_json(orient='index')
 gt_r = json.dumps(ground_truth_dict)
 gt_json = json.loads(gt_r)
 pred_json = json.loads(pred_json_str)
+with open('gt_json', 'w') as gt_json:
+    json.dump(ground_truth_dict, gt_json)
+with open('pred_json', 'w') as pred_json:
+    json.dump(pred_json_str, pred_json)
 
 # calculate average precision
 data = get_avg_precision_at_iou(gt_json, pred_json, iou_thres)

@@ -182,7 +182,7 @@ def get_model_scores_map(pred_boxes):
     """
     model_scores_map = {}
     for img_id, val in pred_boxes.items():
-        for score in val['scores']:
+        for score in val['conf']:
             if score not in model_scores_map.keys():
                 model_scores_map[score] = [img_id]
             else:
@@ -217,11 +217,12 @@ def get_avg_precision_at_iou(gt_boxes, pred_boxes, iou_thr=0.5):
 
     # Sort the predicted boxes in descending order (lowest scoring boxes first):
     for img_id in pred_boxes.keys():
-        arg_sort = np.argsort(pred_boxes[img_id]['scores'])
-        pred_boxes[img_id]['scores'] = np.array(pred_boxes[img_id]['scores'])[arg_sort].tolist()
-        pred_boxes[img_id]['boxes'] = np.array(pred_boxes[img_id]['boxes'])[arg_sort].tolist()
+        arg_sort = np.argsort(pred_boxes[img_id]['conf'])
+        pred_boxes[img_id]['conf'] = np.array(pred_boxes[img_id]['conf'])[arg_sort].tolist()
+        pred_boxes[img_id]['predicted'] = np.array(pred_boxes[img_id]['predicted'])[arg_sort].tolist()
 
     pred_boxes_pruned = deepcopy(pred_boxes)
+
     precisions = []
     recalls = []
     model_thrs = []
@@ -232,7 +233,7 @@ def get_avg_precision_at_iou(gt_boxes, pred_boxes, iou_thr=0.5):
         img_ids = gt_boxes.keys() if ithr == 0 else model_scores_map[model_score_thr]
         for img_id in img_ids:
             gt_boxes_img = gt_boxes[img_id]
-            box_scores = pred_boxes_pruned[img_id]['scores']
+            box_scores = pred_boxes_pruned[img_id]['conf']
             start_idx = 0
             for score in box_scores:
                 if score <= model_score_thr:
@@ -242,18 +243,20 @@ def get_avg_precision_at_iou(gt_boxes, pred_boxes, iou_thr=0.5):
                     break
 
             # Remove boxes, scores of lower than threshold scores:
-            pred_boxes_pruned[img_id]['scores'] = pred_boxes_pruned[img_id]['scores'][start_idx:]
-            pred_boxes_pruned[img_id]['boxes'] = pred_boxes_pruned[img_id]['boxes'][start_idx:]
+            pred_boxes_pruned[img_id]['conf'] = pred_boxes_pruned[img_id]['conf'][start_idx:]
+            pred_boxes_pruned[img_id]['predicted'] = pred_boxes_pruned[img_id]['predicted'][start_idx:]
 
             # Recalculate image results for this image
             img_results[img_id] = get_single_image_results(
-                gt_boxes_img, pred_boxes_pruned[img_id]['boxes'], iou_thr)
+                gt_boxes_img, pred_boxes_pruned[img_id]['predicted'], iou_thr)
 
         prec, rec = calc_precision_recall(img_results)
         precisions.append(prec)
         recalls.append(rec)
         model_thrs.append(model_score_thr)
 
+    for precision in precisions:
+        print(precision)
     precisions = np.array(precisions)
     recalls = np.array(recalls)
     prec_at_rec = []
@@ -294,11 +297,12 @@ def plot_pr_curve(
 
 if __name__ == "__main__":
 
-    with open('ground_truth_boxes.json') as infile:
+    with open('gt.json') as infile:
         gt_boxes = json.load(infile)
 
-    with open('predicted_boxes.json') as infile:
+    with open('pred.json') as infile:
         pred_boxes = json.load(infile)
+
     # Runs it for one IoU threshold
     iou_thr = 0.7
     start_time = time.time()
