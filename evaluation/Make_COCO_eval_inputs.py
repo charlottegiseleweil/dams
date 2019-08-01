@@ -78,6 +78,9 @@ for fn in pred_bbox_fn:
     pred_conf_list.append(conf)
     pred_classes_list.append(arr0)
 
+# add category input
+categories = [{0:'dam'}]
+
 # prepare ground_truth input for COCOWrapper
 groundtruth_dict = coco_tools.ExportGroundtruthToCOCO(
     gt_img_ids, 
