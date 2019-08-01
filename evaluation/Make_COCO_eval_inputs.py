@@ -28,7 +28,7 @@ def parse_txt (label_fp, format_bbox):
             x_max = int(vals[2])
             y_max = int(vals[3])
             conf = float(vals[5])  
-        coords = [np.array([x_min, y_min, x_max, y_max])]
+        coords = [np.array([[x_min, y_min, x_max, y_max]])]
         conf = np.array([float('%.4f'%(conf))])
         return coords, conf
     elif format_bbox == 'xywh_norm':
@@ -47,7 +47,7 @@ def parse_txt (label_fp, format_bbox):
                 y_min = int((norm_y * 419) - ((norm_h * 419) / 2))
                 x_max = int((norm_x * 419) + ((norm_w * 419) / 2))
                 y_max = int((norm_y * 419) + ((norm_h * 419) / 2))
-                coords = [np.array([x_min, y_min, x_max, y_max])]
+                coords = [np.array([[x_min, y_min, x_max, y_max]])]
                 return coords
 
 # add class label (only one class, so zero) to each list
