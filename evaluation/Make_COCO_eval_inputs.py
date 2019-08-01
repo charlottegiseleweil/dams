@@ -86,7 +86,7 @@ groundtruth_dict = coco_tools.ExportGroundtruthToCOCO(
     gt_img_ids, 
     gt_bboxes_list, 
     gt_classes_list,
-    1, 
+    categories, 
 )    
 
 # prepare detections input for COCOWrapper
