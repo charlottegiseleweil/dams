@@ -51,7 +51,7 @@ def parse_txt (label_fp, format_bbox):
                 return coords
 
 # add class label (only one class, so zero) to each list
-arr0 = np.array([0])
+arr0 = np.array([[0]])
 
 # build ground_truth_bboxes_list and classes_list
 gt_bbox_fn = os.listdir(os.path.join(args.ground_truth_bboxes))
