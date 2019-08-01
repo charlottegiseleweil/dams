@@ -79,7 +79,7 @@ for fn in pred_bbox_fn:
     pred_classes_list.append(arr0)
 
 # add category input
-categories = [{0:'dam'}]
+categories = [{'id' : 0, 'name' : 'dam'}]
 
 # prepare ground_truth input for COCOWrapper
 groundtruth_dict = coco_tools.ExportGroundtruthToCOCO(
