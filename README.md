@@ -11,7 +11,7 @@ See readme in [dams/tfod/training/](https://github.com/charlottegiseleweil/dams/
 python model_train.py --logtostderr --train_dir=training/ --pipeline_config_path=training/{{CONFIG FILE}}.config
 ```
 
-# Inference
+# Inference (TFOD)
 
 1) Export frozen graph with [dams/tfod/detection/export_inference_graph.py](https://github.com/charlottegiseleweil/dams/tree/master/tfod/detection)
 ```
