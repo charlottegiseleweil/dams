@@ -7,13 +7,15 @@ See https://bitbucket.org/natcap/extract-dams/src/default/
 # Training (TFOD)
 
 See readme in [dams/tfod/training/](https://github.com/charlottegiseleweil/dams/tree/master/tfod/training)
-```python model_train.py --logtostderr --train_dir=training/ --pipeline_config_path=training/{{CONFIG FILE}}.config
+```
+python model_train.py --logtostderr --train_dir=training/ --pipeline_config_path=training/{{CONFIG FILE}}.config
 ```
 
 # Inference
 
 1) Export frozen graph with [dams/tfod/detection/export_inference_graph.py](https://github.com/charlottegiseleweil/dams/tree/master/tfod/detection)
-```python export_inference_graph.py \
+```
+python export_inference_graph.py \
     --input_type image_tensor \
     --pipeline_config_path ../../../../repos/dams/tfod/training/configs/07_29_imagery7-25_Faster_rcnn_resnet50_coco.config \
     --trained_checkpoint_prefix ../../../../outputs/fasterRCNN_07_27_newimagery/model.ckpt-300000 \
