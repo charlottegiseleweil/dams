@@ -6,8 +6,12 @@ calc_coco_metrics.py usage:
     Inputs:
         directory of predicted bounding boxes as txts
             txt format may be 'x1y1x2y2' or 'xywh_norm'
+            <x1> <y1> <x2> <y2> <class> <confidence> (separated by spaces, all ints except for confidence, which is float)
+            <x-norm> <y-norm> <w-norm> <h-norm> <class> <confidence> (separated by spaces, all floats except for class, which is int)
         directory of ground truth bounding boxea as txts
             txt format may be 'x1y1x2y2' or 'xywh_norm'
+            <x1> <y1> <x2> <y2> <class> <confidence> (separated by spaces, all ints except for confidence, which is float)
+            <x-norm> <y-norm> <w-norm> <h-norm> <class> <confidence> (separated by spaces, all floats except for class, which is int)
     Outputs:
         COCO metrics printed to console (by calling coco_eval.py)
 
@@ -72,8 +76,8 @@ def parse_txt (label_fp, format_bbox, dataset):
             conf = np.array([float('%.4f'%(conf))])
             return coords, conf
     elif format_bbox == 'xywh_norm':
-        with open(label_fp, 'r') as label_txt:
-            line = label_txt.readline()
+        with open(label_fp, 'r') as label:
+            line = label.readline()
             vals = line.split(' ')
             norm_x = float(vals[1])
             norm_y = float(vals[2])
@@ -90,7 +94,6 @@ def parse_txt (label_fp, format_bbox, dataset):
             conf = float(vals[5])
             conf = np.array([float('%.4f'%(conf))])
             return coords, conf
-            return coords
 
 # add class label (only one class, so zero) to each list
 arr0 = np.array([0])
