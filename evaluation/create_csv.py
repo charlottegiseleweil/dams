@@ -42,7 +42,7 @@ def parse_txt (label_fp, format_bbox, dataset):
 		if dataset == 'ground_truth':
 			return np.array([0, 0, 0, 0])
 		else:
-			return np.array([0, 0, 0, 0]), float(0)
+			return np.array([1, 1, 1, 1]), float(0)
 	else:
 		if format_bbox == 'x1y1x2y2':
 			with open(label_fp, 'r') as label:
