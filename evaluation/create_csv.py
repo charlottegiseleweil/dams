@@ -12,9 +12,9 @@ parser.add_argument('--predicted_format', type=str, default='x1y1x2y2', help='tx
 parser.add_argument('--ground_truth_bboxes', type=str, default='../../../data/yolov3-inputs_imagery-7-25_cropped_419/validation_set/labels/')
 parser.add_argument('--ground_truth_format', type=str, default='xywh_norm', help='txt format for ground_truth bbox files')
 parser.add_argument('--iou_thres', type=float, default=0.5, help='IoU threshold for mAP calculation')
+parser.add_argument('--output_path', type=str, default='results_validation_fasterRCNN-07-27_IoU2.csv', help='path for output csv')
 args = parser.parse_args()
 print(args)
-
 # set directory paths
 images_dir = os.path.join(args.images)
 pred_bbox_dir = os.path.join(args.predicted_bboxes)
@@ -35,8 +35,8 @@ def parse_txt (label_fp, format_bbox, dataset):
 		format_bbox: 'x1y1x2y2' or 'xywh_norm' or 'x1y1x2y2_norm'
 		dataset: 'predicted' or 'ground_truth'
 	Returns:
-		coords (numpy array of shape [1, 4])
-		conf (nfloat, returned only if dataset == 'predicted')
+		coords (numpy array)
+		conf (float, returned only if dataset == 'predicted')
 	"""
 	if 'not_a_dam' in label_fp:
 		if dataset == 'ground_truth':
@@ -94,8 +94,14 @@ def parse_txt (label_fp, format_bbox, dataset):
 				conf = '%.4f'%(conf)
 				return coords, conf
 
-# function to calculate IoU from bboxes in np.array format
 def calc_IoU (ground_truth, predicted):
+	"""Calculate IoU of single predicted and ground truth box
+	Args:
+		pred_box (list of ints): location of predicted object as [xmin, ymin, xmax, ymax]
+		gt_box (list of ints): location of ground truth object as [xmin, ymin, xmax, ymax]
+	Returns:
+		float: value of the IoU for the two boxes.
+	"""
 	# gather gt and pred coords
 	x1_t, y1_t, x2_t, y2_t = ground_truth
 	x1_p, y1_p, x2_p, y2_p = predicted
@@ -156,3 +162,6 @@ detect_df['tp@IoU'+str(iou_thres)] = np.where(((detect_df.predicted.notnull()) &
 detect_df['fp@IoU'+str(iou_thres)] = np.where(((detect_df.predicted.notnull()) & (detect_df.iou >= iou_thres)) & detect_df.ground_truth.isnull(), '1', '0')
 detect_df['fn@IoU'+str(iou_thres)] = np.where(((detect_df.predicted.isnull()) & (detect_df.iou < iou_thres)) & detect_df.ground_truth.notnull(), '1', '0')
 print(detect_df)
+
+# save as .csv
+detect_df.to_csv(path_or_buf=args.output_path)
