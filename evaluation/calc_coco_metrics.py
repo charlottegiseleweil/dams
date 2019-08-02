@@ -50,7 +50,7 @@ parser = argparse.ArgumentParser(description='Custom COCO metrics')
 parser.add_argument('--predicted_bboxes', type=str, default='../../../outputs/yolov3_08-01_detection_results_validation/pred', help='directory of .txt files of predicted bounding boxes')
 parser.add_argument('--ground_truth_bboxes', type=str, default='../../../data/yolov3-inputs_imagery-7-25_cropped_419/validation_set/labels')
 parser.add_argument('--predicted_format', type=str, default='x1y1x2y2_norm')
-parser.add_argument('--ground_truth_formate', type=str, default='xywh_norm')
+parser.add_argument('--ground_truth_format', type=str, default='xywh_norm')
 args = parser.parse_args()
 print(args)
 
