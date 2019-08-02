@@ -8,7 +8,9 @@ import numpy as np
 parser = argparse.ArgumentParser(description='Custom COCO metrics')
 parser.add_argument('--images', type=str, default='../../../outputs/yolov3_08-01_detection_results_validation/images', help='directory of images output from detect.py')
 parser.add_argument('--predicted_bboxes', type=str, default='../../../outputs/yolov3_08-01_detection_results_validation/pred/', help='directory of .txt files of predicted bounding boxes')
+parser.add_argument('--predicted_format', type=str, default='x1y1x2y2', help='txt format for predicted bbox files')
 parser.add_argument('--ground_truth_bboxes', type=str, default='../../../data/yolov3-inputs_imagery-7-25_cropped_419/validation_set/labels/')
+parser.add_argument('--ground_truth_format', type=str, default='xywh_norm', help='txt format for ground_truth bbox files')
 parser.add_argument('--iou_thres', type=float, default=0.5, help='IoU threshold for mAP calculation')
 args = parser.parse_args()
 print(args)
@@ -25,8 +27,7 @@ gt_bbox_fn = os.listdir(gt_bbox_dir)
 
 # constants
 iou_thres = args.iou_thres
-#lim_small = int(size_thres.split(',')[0]) ** 2
-#lim_medium = int(size_thres.split(',')[1]) ** 2
+
 def parse_txt (label_fp, format_bbox, dataset):
 	"""Obtain x_min, y_min, x_max, and y_max of bounding box from txt file
 	Args:
@@ -56,7 +57,7 @@ def parse_txt (label_fp, format_bbox, dataset):
 				return coords
 			elif dataset == 'predicted':
 				conf = float(vals[5])
-				conf = float('%.4f'%(conf))
+				conf = '%.4f'%(conf)
 				return coords, conf
 		if format_bbox == 'x1y1x2y2_norm':
 			with open(label_fp, 'r') as label:
@@ -71,7 +72,7 @@ def parse_txt (label_fp, format_bbox, dataset):
 				return coords
 			elif dataset == 'predicted':
 				conf = float(vals[5])
-				conf = float('%.4f'%(conf))
+				conf = '%.4f'%(conf)
 				return coords, conf
 		elif format_bbox == 'xywh_norm':
 			with open(label_fp, 'r') as label:
@@ -90,48 +91,8 @@ def parse_txt (label_fp, format_bbox, dataset):
 				return coords
 			elif dataset == 'predicted':
 				conf = float(vals[5])
-				conf = float('%.4f'%(conf))
+				conf = '%.4f'%(conf)
 				return coords, conf
-
-# function to parse predicted bounding box txt files for min/max values
-def parse_pred_bbox (label_fp):
-	with open(label_fp, 'r') as label:
-		line = str(label.readline())
-		vals = line.split(' ')
-		x_min = int(vals[0])
-		y_min = int(vals[1])
-		x_max = int(vals[2])
-		y_max = int(vals[3])
-	coords = np.array([x_min, y_min, x_max, y_max])
-	return coords
-
-# function to parse predicted bounding box txt files for confidence level
-def parse_pred_box_conf (label_fp):
-	with open(label_fp, 'r') as label:
-		line = str(label.readline())
-		vals = line.split(' ')
-		conf = float(vals[5])
-		conf = '%.4f'%(conf)
-	return conf
-
-# function to parse ground truth bounding box txt files for min/max values
-def parse_gt_bbox (label_fp):
-	if 'not_a_dam' in label_fp:
-		return np.array([0,0,0,0])
-	else:
-		with open(label_fp, 'r') as label_txt:
-			line = label_txt.readline()
-			vals = line.split(' ')
-			norm_x = float(vals[1])
-			norm_y = float(vals[2])
-			norm_w = float(vals[3])
-			norm_h = float(vals[4])
-			x_min = int((norm_x * 419) - ((norm_w * 419) / 2))
-			y_min = int((norm_y * 419) - ((norm_h * 419) / 2))
-			x_max = int((norm_x * 419) + ((norm_w * 419) / 2))
-			y_max = int((norm_y * 419) + ((norm_h * 419) / 2))
-		coords = np.array([x_min, y_min, x_max, y_max])
-		return coords
 
 # function to calculate IoU from bboxes in np.array format
 def calc_IoU (ground_truth, predicted):
@@ -153,28 +114,14 @@ def calc_IoU (ground_truth, predicted):
 	return iou
 
 # create dictionaries of ground_truth bboxes,  predicted bboxes, and confidence
-'''
 ground_truth_dict = {}
 for fn in gt_bbox_fn:
-	bbox = parse_gt_bbox(os.path.join(gt_bbox_dir, fn))
-	ground_truth_dict[fn.replace('.txt', '.png')] = bbox
-predicted_dict = {}
-for fn in pred_bbox_fn:
-	bbox = parse_pred_bbox(os.path.join(pred_bbox_dir, fn))
-	predicted_dict[fn.replace('.txt', '.png')] = bbox
-conf_dict = {}
-for fn in pred_bbox_fn:
-	conf = parse_pred_box_conf(os.path.join(pred_bbox_dir, fn))
-	conf_dict[fn.replace('.txt', '.png')] = conf
-'''
-ground_truth_dict = {}
-for fn in gt_bbox_fn:
-	bbox = parse_txt(os.path.join(gt_bbox_dir, fn), 'xywh_norm', 'ground_truth')
+	bbox = parse_txt(os.path.join(gt_bbox_dir, fn), args.ground_truth_format, 'ground_truth')
 	ground_truth_dict[fn.replace('.txt', '.png')] = bbox
 predicted_dict = {}
 conf_dict = {}
 for fn in pred_bbox_fn:
-	bbox, conf = parse_txt(os.path.join(pred_bbox_dir, fn), 'x1y1x2y2', 'predicted')
+	bbox, conf = parse_txt(os.path.join(pred_bbox_dir, fn), args.predicted_format, 'predicted')
 	predicted_dict[fn.replace('.txt', '.png')] = bbox
 	conf_dict[fn.replace('.txt', '.png')] = conf
 
@@ -209,6 +156,3 @@ detect_df['tp@IoU'+str(iou_thres)] = np.where(((detect_df.predicted.notnull()) &
 detect_df['fp@IoU'+str(iou_thres)] = np.where(((detect_df.predicted.notnull()) & (detect_df.iou >= iou_thres)) & detect_df.ground_truth.isnull(), '1', '0')
 detect_df['fn@IoU'+str(iou_thres)] = np.where(((detect_df.predicted.isnull()) & (detect_df.iou < iou_thres)) & detect_df.ground_truth.notnull(), '1', '0')
 print(detect_df)
-
-
-
