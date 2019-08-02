@@ -32,23 +32,19 @@ def parse_txt (label_fp, format_bbox):
         conf = np.array([float('%.4f'%(conf))])
         return coords, conf
     elif format_bbox == 'xywh_norm':
-        if 'not_a_dam' in label_fp:
-            coords = np.array([[0,0,0,0]])
+        with open(label_fp, 'r') as label_txt:
+            line = label_txt.readline()
+            vals = line.split(' ')
+            norm_x = float(vals[1])
+            norm_y = float(vals[2])
+            norm_w = float(vals[3])
+            norm_h = float(vals[4])
+            x_min = int((norm_x * 419) - ((norm_w * 419) / 2))
+            y_min = int((norm_y * 419) - ((norm_h * 419) / 2))
+            x_max = int((norm_x * 419) + ((norm_w * 419) / 2))
+            y_max = int((norm_y * 419) + ((norm_h * 419) / 2))
+            coords = np.array([[x_min, y_min, x_max, y_max]])
             return coords
-        else:
-            with open(label_fp, 'r') as label_txt:
-                line = label_txt.readline()
-                vals = line.split(' ')
-                norm_x = float(vals[1])
-                norm_y = float(vals[2])
-                norm_w = float(vals[3])
-                norm_h = float(vals[4])
-                x_min = int((norm_x * 419) - ((norm_w * 419) / 2))
-                y_min = int((norm_y * 419) - ((norm_h * 419) / 2))
-                x_max = int((norm_x * 419) + ((norm_w * 419) / 2))
-                y_max = int((norm_y * 419) + ((norm_h * 419) / 2))
-                coords = np.array([[x_min, y_min, x_max, y_max]])
-                return coords
 
 # add class label (only one class, so zero) to each list
 arr0 = np.array([0])
@@ -60,9 +56,10 @@ gt_img_ids = []
 gt_classes_list = []
 gt_bboxes_list = []
 for fn in gt_bbox_fn:
-    gt_img_ids.append(fn)
-    gt_bboxes_list.append(parse_txt(os.path.join(args.ground_truth_bboxes, fn), 'xywh_norm'))
-    gt_classes_list.append(arr0)
+    if 'not_a_dam' not in fn:
+        gt_img_ids.append(fn)
+        gt_bboxes_list.append(parse_txt(os.path.join(args.ground_truth_bboxes, fn), 'xywh_norm'))
+        gt_classes_list.append(arr0)
 
 # build predicited_bboxes_list, conf_list, and classes_list
 pred_bbox_fn = os.listdir(os.path.join(args.predicted_bboxes))
@@ -72,11 +69,12 @@ pred_classes_list = []
 pred_conf_list = []
 pred_bboxes_list = []
 for fn in pred_bbox_fn:
-    pred_img_ids.append(fn)
-    coords, conf = parse_txt(os.path.join(args.predicted_bboxes, fn), 'x1y1x2y2')
-    pred_bboxes_list.append(coords)
-    pred_conf_list.append(conf)
-    pred_classes_list.append(arr0)
+    if 'not_a_dam' not in fn:
+        pred_img_ids.append(fn)
+        coords, conf = parse_txt(os.path.join(args.predicted_bboxes, fn), 'x1y1x2y2')
+        pred_bboxes_list.append(coords)
+        pred_conf_list.append(conf)
+        pred_classes_list.append(arr0)
 
 # add category input
 categories = [{'id' : 0, 'name' : 'dam'}]
