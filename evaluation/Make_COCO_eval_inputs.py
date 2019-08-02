@@ -12,12 +12,15 @@ parser.add_argument('--ground_truth_bboxes', type=str, default='../../../data/yo
 args = parser.parse_args()
 print(args)
 
-def parse_txt (label_fp, format_bbox):
+def parse_txt (label_fp, format_bbox, dataset):
     """Obtain x_min, y_min, x_max, and y_max of bounding box from txt file
     Args:
         label_fp (str): filepath to bounding box .txt file in detect.py output format
+        format_bbox: 'x1y1x2y2' or 'xywh_norm'
+        dataset: 'predicted' or 'ground_truth'
     Returns:
-        coords (list of list)
+        coords (numpy array of shape [1, 4])
+        conf (numpy array of shape [1], returned only if dataset == 'predicted')
     """
     if format_bbox == 'x1y1x2y2':
         with open(label_fp, 'r') as label:
@@ -27,10 +30,13 @@ def parse_txt (label_fp, format_bbox):
             y_min = int(vals[1])
             x_max = int(vals[2])
             y_max = int(vals[3])
-            conf = float(vals[5])  
         coords = np.array([[x_min, y_min, x_max, y_max]])
-        conf = np.array([float('%.4f'%(conf))])
-        return coords, conf
+        if dataset == 'ground_truth':
+            return coords
+        elif dataset == 'predicted':
+            conf = float(vals[5])
+            conf = np.array([float('%.4f'%(conf))])
+            return coords, conf
     elif format_bbox == 'xywh_norm':
         with open(label_fp, 'r') as label_txt:
             line = label_txt.readline()
@@ -44,6 +50,12 @@ def parse_txt (label_fp, format_bbox):
             x_max = int((norm_x * 419) + ((norm_w * 419) / 2))
             y_max = int((norm_y * 419) + ((norm_h * 419) / 2))
             coords = np.array([[x_min, y_min, x_max, y_max]])
+        if dataset == 'ground_truth':
+            return coords
+        elif dataset == 'predicted':
+            conf = float(vals[5])
+            conf = np.array([float('%.4f'%(conf))])
+            return coords, conf
             return coords
 
 # add class label (only one class, so zero) to each list
@@ -58,7 +70,7 @@ gt_bboxes_list = []
 for fn in gt_bbox_fn:
     if 'not_a_dam' not in fn:
         gt_img_ids.append(fn)
-        gt_bboxes_list.append(parse_txt(os.path.join(args.ground_truth_bboxes, fn), 'xywh_norm'))
+        gt_bboxes_list.append(parse_txt(os.path.join(args.ground_truth_bboxes, fn), 'xywh_norm', 'ground_truth'))
         gt_classes_list.append(arr0)
 
 # build predicited_bboxes_list, conf_list, and classes_list
@@ -71,7 +83,7 @@ pred_bboxes_list = []
 for fn in pred_bbox_fn:
     if 'not_a_dam' not in fn:
         pred_img_ids.append(fn)
-        coords, conf = parse_txt(os.path.join(args.predicted_bboxes, fn), 'x1y1x2y2')
+        coords, conf = parse_txt(os.path.join(args.predicted_bboxes, fn), 'x1y1x2y2', 'predicted')
         pred_bboxes_list.append(coords)
         pred_conf_list.append(conf)
         pred_classes_list.append(arr0)
