@@ -68,7 +68,7 @@ def parse_txt (label_fp, format_bbox, dataset):
             y_min = int(vals[1])
             x_max = int(vals[2])
             y_max = int(vals[3])
-        coords = np.array([[x_min, y_min, x_max, y_max]])
+        coords = np.array([[y_min, x_min, y_max, x_max]])
         if dataset == 'ground_truth':
             return coords
         elif dataset == 'predicted':
@@ -87,7 +87,7 @@ def parse_txt (label_fp, format_bbox, dataset):
             y_min = int((norm_y * 419) - ((norm_h * 419) / 2))
             x_max = int((norm_x * 419) + ((norm_w * 419) / 2))
             y_max = int((norm_y * 419) + ((norm_h * 419) / 2))
-            coords = np.array([[x_min, y_min, x_max, y_max]])
+            coords = np.array([[y_min, x_min, y_max, x_max]])
         if dataset == 'ground_truth':
             return coords
         elif dataset == 'predicted':
