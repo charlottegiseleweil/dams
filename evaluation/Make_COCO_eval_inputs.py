@@ -94,7 +94,8 @@ detections_list = coco_tools.ExportDetectionsToCOCO(
     pred_img_ids, 
     pred_bboxes_list, 
     pred_conf_list, 
-    pred_classes_list, 
+    pred_classes_list,
+    categories
 ) 
 
 # calculate
