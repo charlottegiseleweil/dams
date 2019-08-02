@@ -1,0 +1,5 @@
+classes = 1
+train = /data/home/adminatcap/charlie/data/yolov3-inputs_imagery-7-25_cropped_419/training_set/training_set_image_filepaths_abs.txt
+valid = /data/home/adminatcap/charlie/data/yolov3-inputs_imagery-7-25_cropped_419/validation_set/validation_set_image_filepaths_abs.txt
+names = /data/home/adminatcap/charlie/repos/dams/yolov3/cfg/dams.names
+backup = /data/home/adminatcap/charlie/outputs/yolov3-outputs_7-29_cropped_419/
