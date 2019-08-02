@@ -18,7 +18,6 @@ calc_coco_metrics.py usage:
         COCO metrics printed to console (by calling coco_eval.py)
 
 coco_eval.py usage:
-
     Given a set of images with ids in the list image_ids
     and corresponding lists of numpy arrays encoding groundtruth (boxes and classes)
     and detections (boxes, scores and classes), where elements of each list
