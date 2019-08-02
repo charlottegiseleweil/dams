@@ -1,3 +1,37 @@
+''' 
+Prepares input for object_detection/metrics/coco_eval.py 
+Runs object_detection/metrics/coco_eval.py to calculate COCO metrics
+
+calc_coco_metrics.py usage:
+    Inputs:
+        directory of predicted bounding boxes as txts
+            txt format may be 'x1y1x2y2' or 'xywh_norm'
+        directory of ground truth bounding boxea as txts
+            txt format may be 'x1y1x2y2' or 'xywh_norm'
+    Outputs:
+        COCO metrics printed to console (by calling coco_eval.py)
+
+coco_eval.py usage:
+
+    Given a set of images with ids in the list image_ids
+    and corresponding lists of numpy arrays encoding groundtruth (boxes and classes)
+    and detections (boxes, scores and classes), where elements of each list
+    correspond to detections/annotations of a single image,
+    then evaluation (in multi-class mode) can be invoked as follows:
+      groundtruth_dict = coco_tools.ExportGroundtruthToCOCO(
+          image_ids, groundtruth_boxes_list, groundtruth_classes_list,
+          max_num_classes, output_path=None)
+      detections_list = coco_tools.ExportDetectionsToCOCO(
+          image_ids, detection_boxes_list, detection_scores_list,
+          detection_classes_list, output_path=None)
+      groundtruth = coco_tools.COCOWrapper(groundtruth_dict)
+      detections = groundtruth.LoadAnnotations(detections_list)
+      evaluator = coco_tools.COCOEvalWrapper(groundtruth, detections,
+                                             agnostic_mode=False)
+      metrics = evaluator.ComputeMetrics()
+  
+'''
+
 # imports
 import argparse
 import pandas as pd 
