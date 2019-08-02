@@ -5,13 +5,15 @@ Runs object_detection/metrics/coco_eval.py to calculate COCO metrics
 calc_coco_metrics.py usage:
     Inputs:
         directory of predicted bounding boxes as txts
-            txt format may be 'x1y1x2y2' or 'xywh_norm'
-            <x1> <y1> <x2> <y2> <class> <confidence> (separated by spaces, all ints except for confidence, which is float)
-            <x-norm> <y-norm> <w-norm> <h-norm> <class> <confidence> (separated by spaces, all floats except for class, which is int)
         directory of ground truth bounding boxea as txts
-            txt format may be 'x1y1x2y2' or 'xywh_norm'
+        txt format for predicted
             <x1> <y1> <x2> <y2> <class> <confidence> (separated by spaces, all ints except for confidence, which is float)
             <x-norm> <y-norm> <w-norm> <h-norm> <class> <confidence> (separated by spaces, all floats except for class, which is int)
+            <x1-norm> <y1-norm> <w1-norm> <h1-norm> <class> <confidence> (separated by spaces, all floats except for class, which is int)
+        txt format for ground_truth
+            <x1> <y1> <x2> <y2> <class> <confidence> (separated by spaces, all ints except for confidence, which is float)
+            <x-norm> <y-norm> <w-norm> <h-norm> <class> <confidence> (separated by spaces, all floats except for class, which is int)
+            <x1-norm> <y1-norm> <w1-norm> <h1-norm> <class> <confidence> (separated by spaces, all floats except for class, which is int)
     Outputs:
         COCO metrics printed to console (by calling coco_eval.py)
 
@@ -47,6 +49,8 @@ from object_detection.metrics import coco_tools
 parser = argparse.ArgumentParser(description='Custom COCO metrics')
 parser.add_argument('--predicted_bboxes', type=str, default='../../../outputs/yolov3_08-01_detection_results_validation/pred', help='directory of .txt files of predicted bounding boxes')
 parser.add_argument('--ground_truth_bboxes', type=str, default='../../../data/yolov3-inputs_imagery-7-25_cropped_419/validation_set/labels')
+parser.add_argument('--predicted_format', type=str, default='x1y1x2y2_norm')
+parser.add_argument('--ground_truth_formate', type=str, default='xywh_norm')
 args = parser.parse_args()
 print(args)
 
@@ -54,7 +58,7 @@ def parse_txt (label_fp, format_bbox, dataset):
     """Obtain x_min, y_min, x_max, and y_max of bounding box from txt file
     Args:
         label_fp (str): filepath to bounding box .txt file in detect.py output format
-        format_bbox: 'x1y1x2y2' or 'xywh_norm'
+        format_bbox: 'x1y1x2y2' or 'xywh_norm' or 'x1y1x2y2_norm'
         dataset: 'predicted' or 'ground_truth'
     Returns:
         coords (numpy array of shape [1, 4])
@@ -68,6 +72,21 @@ def parse_txt (label_fp, format_bbox, dataset):
             y_min = int(vals[1])
             x_max = int(vals[2])
             y_max = int(vals[3])
+        coords = np.array([[y_min, x_min, y_max, x_max]])
+        if dataset == 'ground_truth':
+            return coords
+        elif dataset == 'predicted':
+            conf = float(vals[5])
+            conf = np.array([float('%.4f'%(conf))])
+            return coords, conf
+    if format_bbox == 'x1y1x2y2_norm':
+        with open(label_fp, 'r') as label:
+            line = str(label.readline())
+            vals = line.split(' ')
+            x_min = int(float(vals[0]) * 419)
+            y_min = int(float(vals[1]) * 419)
+            x_max = int(float(vals[2]) * 419)
+            y_max = int(float(vals[3]) * 419)
         coords = np.array([[y_min, x_min, y_max, x_max]])
         if dataset == 'ground_truth':
             return coords
@@ -107,7 +126,7 @@ gt_bboxes_list = []
 for fn in gt_bbox_fn:
     if 'not_a_dam' not in fn:
         gt_img_ids.append(fn)
-        gt_bboxes_list.append(parse_txt(os.path.join(args.ground_truth_bboxes, fn), 'xywh_norm', 'ground_truth'))
+        gt_bboxes_list.append(parse_txt(os.path.join(args.ground_truth_bboxes, fn), args.ground_truth_format, 'ground_truth'))
         gt_classes_list.append(arr0)
 
 # build predicited_bboxes_list, conf_list, and classes_list
@@ -120,7 +139,7 @@ pred_bboxes_list = []
 for fn in pred_bbox_fn:
     if 'not_a_dam' not in fn:
         pred_img_ids.append(fn)
-        coords, conf = parse_txt(os.path.join(args.predicted_bboxes, fn), 'x1y1x2y2', 'predicted')
+        coords, conf = parse_txt(os.path.join(args.predicted_bboxes, fn), args.predicted_format, 'predicted')
         pred_bboxes_list.append(coords)
         pred_conf_list.append(conf)
         pred_classes_list.append(arr0)
