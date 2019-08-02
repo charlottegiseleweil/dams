@@ -33,7 +33,7 @@ def parse_txt (label_fp, format_bbox):
         return coords, conf
     elif format_bbox == 'xywh_norm':
         if 'not_a_dam' in label_fp:
-            coords = np.array([[0, 0, 0, 0]])
+            coords = np.array([[]])
             return coords
         else:
             with open(label_fp, 'r') as label_txt:
