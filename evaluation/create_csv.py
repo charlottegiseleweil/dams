@@ -160,7 +160,7 @@ print('added iou')
 # add tp, fp, and fn
 detect_df['tp@IoU'+str(iou_thres)] = np.where(((detect_df.predicted.notnull()) & (detect_df.iou >= iou_thres)) & detect_df.ground_truth.notnull(), '1', '0')
 detect_df['fp@IoU'+str(iou_thres)] = np.where((detect_df.predicted.notnull()) & detect_df.ground_truth.isnull(), '1', '0')
-detect_df['fn@IoU'+str(iou_thres)] = np.where(((detect_df.predicted.isnull()) & (detect_df.iou < iou_thres)) & detect_df.ground_truth.notnull(), '1', '0')
+detect_df['fn@IoU'+str(iou_thres)] = np.where(((detect_df.predicted.isnull()) | (detect_df.iou < iou_thres)) & detect_df.ground_truth.notnull(), '1', '0')
 print(detect_df)
 
 # save as .csv
