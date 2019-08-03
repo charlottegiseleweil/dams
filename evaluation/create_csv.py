@@ -40,9 +40,10 @@ def parse_txt (label_fp, format_bbox, dataset):
 	"""
 	if 'not_a_dam' in label_fp:
 		if dataset == 'ground_truth':
-			return np.array([0, 0, 0, 0])
+			return None
 		else:
-			return np.array([1, 1, 1, 1]), float(0)
+			return None, float(0)
+			#return np.array([1, 1, 1, 1]), float(0)
 	else:
 		if format_bbox == 'x1y1x2y2':
 			with open(label_fp, 'r') as label:
@@ -144,7 +145,7 @@ print('added confidence')
 
 # add ground_truth bbox size to dataframe
 detect_df['size'] = detect_df.apply(
-	lambda row: int((row.ground_truth[2] - row.ground_truth[0]) * (row.ground_truth[3] - row.ground_truth[1])), 
+	lambda row: None if row.ground_truth is None else int((row.ground_truth[2] - row.ground_truth[0]) * (row.ground_truth[3] - row.ground_truth[1])), 
 	axis=1
 )
 print('added size')
@@ -152,14 +153,17 @@ print('added size')
 # add IoU to dataframe
 iou_dict = {}
 for fn in predicted_dict:
-	iou = calc_IoU(ground_truth_dict[fn], predicted_dict[fn])
-	iou_dict[fn] = iou
+	if 'not_a_dam' not in fn:
+		iou = calc_IoU(ground_truth_dict[fn], predicted_dict[fn])
+		iou_dict[fn] = iou
+	else:
+		iou_dict[fn] = None
 detect_df['iou'] = detect_df['image'].map(pd.Series(iou_dict))
 print('added iou')
 
 # add tp, fp, and fn
 detect_df['tp@IoU'+str(iou_thres)] = np.where(((detect_df.predicted.notnull()) & (detect_df.iou >= iou_thres)) & detect_df.ground_truth.notnull(), '1', '0')
-detect_df['fp@IoU'+str(iou_thres)] = np.where((np.not_equal(detect_df.predicted, [1, 1, 1, 1]) & (np.array_equal(detect_df.ground_truth, [0, 0, 0, 0]), '1', '0')
+detect_df['fp@IoU'+str(iou_thres)] = np.where(detect_df.predicted.notnull() & detect_df.ground_truth.isnull(), '1', '0')
 detect_df['fn@IoU'+str(iou_thres)] = np.where(((detect_df.predicted.isnull()) | (detect_df.iou < iou_thres)) & detect_df.ground_truth.notnull(), '1', '0')
 print(detect_df)
 
