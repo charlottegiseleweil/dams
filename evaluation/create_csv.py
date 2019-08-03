@@ -38,46 +38,48 @@ def parse_txt (label_fp, format_bbox, dataset):
 		coords (numpy array)
 		conf (float, returned only if dataset == 'predicted')
 	"""
-	if 'not_a_dam' in label_fp:
-		if dataset == 'ground_truth':
-			return None
-		else:
-			return None, float(0)
-			#return np.array([1, 1, 1, 1]), float(0)
-	else:
-		if format_bbox == 'x1y1x2y2':
-			with open(label_fp, 'r') as label:
-				line = str(label.readline())
+	if format_bbox == 'x1y1x2y2':
+		with open(label_fp, 'r') as label:
+			line = str(label.readline())
+			if len(line) == 0:
+				return None
+			else:
 				vals = line.split(' ')
 				x_min = int(vals[0])
 				y_min = int(vals[1])
 				x_max = int(vals[2])
 				y_max = int(vals[3])
-			coords = np.array([y_min, x_min, y_max, x_max])
-			if dataset == 'ground_truth':
-				return coords
-			elif dataset == 'predicted':
-				conf = float(vals[5])
-				conf = '%.4f'%(conf)
-				return coords, conf
-		if format_bbox == 'x1y1x2y2_norm':
-			with open(label_fp, 'r') as label:
-				line = str(label.readline())
+				coords = np.array([y_min, x_min, y_max, x_max])
+				if dataset == 'ground_truth':
+					return coords
+				elif dataset == 'predicted':
+					conf = float(vals[5])
+					conf = '%.4f'%(conf)
+					return coords, conf
+	if format_bbox == 'x1y1x2y2_norm':
+		with open(label_fp, 'r') as label:
+			line = str(label.readline())
+			if len(line) == 0:
+				return None
+			else:
 				vals = line.split(' ')
 				x_min = int(float(vals[0]) * 419)
 				y_min = int(float(vals[1]) * 419)
 				x_max = int(float(vals[2]) * 419)
 				y_max = int(float(vals[3]) * 419)
-			coords = np.array([y_min, x_min, y_max, x_max])
-			if dataset == 'ground_truth':
-				return coords
-			elif dataset == 'predicted':
-				conf = float(vals[5])
-				conf = '%.4f'%(conf)
-				return coords, conf
-		elif format_bbox == 'xywh_norm':
-			with open(label_fp, 'r') as label:
-				line = label.readline()
+				coords = np.array([y_min, x_min, y_max, x_max])
+				if dataset == 'ground_truth':
+					return coords
+				elif dataset == 'predicted':
+					conf = float(vals[5])
+					conf = '%.4f'%(conf)
+					return coords, conf
+	elif format_bbox == 'xywh_norm':
+		with open(label_fp, 'r') as label:
+			line = str(label.readline())
+			if len(line) == 0:
+				return None
+			else:
 				vals = line.split(' ')
 				norm_x = float(vals[1])
 				norm_y = float(vals[2])
@@ -88,12 +90,12 @@ def parse_txt (label_fp, format_bbox, dataset):
 				x_max = int((norm_x * 419) + ((norm_w * 419) / 2))
 				y_max = int((norm_y * 419) + ((norm_h * 419) / 2))
 				coords = np.array([y_min, x_min, y_max, x_max])
-			if dataset == 'ground_truth':
-				return coords
-			elif dataset == 'predicted':
-				conf = float(vals[5])
-				conf = '%.4f'%(conf)
-				return coords, conf
+				if dataset == 'ground_truth':
+					return coords
+				elif dataset == 'predicted':
+					conf = float(vals[5])
+					conf = '%.4f'%(conf)
+					return coords, conf
 
 def calc_IoU (ground_truth, predicted):
 	"""Calculate IoU of single predicted and ground truth box
