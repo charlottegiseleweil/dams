@@ -110,7 +110,7 @@ def calc_IoU (ground_truth, predicted):
 	x1_t, y1_t, x2_t, y2_t = ground_truth
 	x1_p, y1_p, x2_p, y2_p = predicted
 	# make sure the bounding boxes overlap
-	if (x2_p < x1_t) | (x2_t < x1_p):
+	if (x2_p < x1_t) | (x2_t < x1_p) | (y2_p < y1_t) | (y2_t < y1_p):
 		return 0
 	else:
 		# find extremes
@@ -169,9 +169,12 @@ detect_df['iou'] = detect_df['image'].map(pd.Series(iou_dict))
 print('added iou')
 
 # add tp, fp, and fn
-detect_df['tp@IoU'+str(iou_thres)] = np.where(((detect_df.predicted.notnull()) & (detect_df.iou >= iou_thres)) & detect_df.ground_truth.notnull(), '1', '0')
-detect_df['fp@IoU'+str(iou_thres)] = np.where(detect_df.predicted.notnull() & detect_df.ground_truth.isnull(), '1', '0')
-detect_df['fn@IoU'+str(iou_thres)] = np.where(((detect_df.predicted.isnull()) | (detect_df.iou < iou_thres)) & detect_df.ground_truth.notnull(), '1', '0')
+detect_df['tp@IoU'+str(iou_thres)] = np.where((detect_df.iou >= iou_thres), '1', '0')
+#detect_df['tp@IoU'+str(iou_thres)] = np.where(((detect_df.predicted.notnull()) & (detect_df.iou >= iou_thres)) & detect_df.ground_truth.notnull(), '1', '0')
+detect_df['fp@IoU'+str(iou_thres)] = np.where((detect_df.iou < iou_thres) | (detect_df.predicted.isnull() & detect_df.ground_truth.notnull()), '1', '0')
+#detect_df['fp@IoU'+str(iou_thres)] = np.where(detect_df.predicted.notnull() & detect_df.ground_truth.isnull(), '1', '0')
+detect_df['fn@IoU'+str(iou_thres)] = np.where((detect_df.iou < iou_thres) | (detect_df.predicted.notnull() & detect_df.ground_truth.isnull()), '1', '0')
+#detect_df['fn@IoU'+str(iou_thres)] = np.where(((detect_df.predicted.isnull()) | (detect_df.iou < iou_thres)) & detect_df.ground_truth.notnull(), '1', '0')
 print(detect_df)
 
 # save as .csv
