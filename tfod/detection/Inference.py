@@ -1,84 +1,28 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# * Step 1) Exports a trained model into a frozen graph
-# * Step 2) Runs inference on sample images
+######
+#
+# Inference.py
+#
+# Inputs a TF inference graph(frozen model .pb, obtained with export_inference_graph.py),
+# and a directory of images
+#
+# Runs inference, outputs bboxes, in a text file per image with format:
+# {x_min} {y_min} {x_max} {y_max} {class(int)} {confidence}
+#
+# (For visualization of results, see Inference.ipynb)
+#
+# Charlotte Weil, August 2019
 # 
-# */!\ Can't have 2 notebooks with tf.Sessions in parrallel !*
-# 
-# Run from environment with requirements:
-# * TFOD All things
-# * humanfriendly
-# * *e.g use docker epic_cray in Cobbdam.*
-
-# In[67]:
+#
+# TODOs/WIP:
+# bbox_formats not all supported yet.
 
 
+# imports
+
+import argparse
 import os
-import tqdm
+import pandas as pd
 import numpy as np
-
-path_to_root = '../../../..'
-path_to_outputs = os.path.join(path_to_root,'outputs/fasterRCNN_07_02_img_resize')
-
-
-# # Step 1) Export graph (.pbtxt to .pb)
-
-# ### Option a) Freeze graph w/ tf.python.tool.freeze_graph()
-# Issue: Hard to determine output_node_names
-
-# In[ ]:
-
-
-from tensorflow.python.tools import freeze_graph
-
-
-# In[ ]:
-
-
-pbtxt_path = os.path.join(path_to_outputs, 'graph.pbtxt')
-ckpt_path = os.path.join(path_to_outputs, 'model.ckpt-300000')
-frozen_graph_path = os.path.join(path_to_outputs, "frozen_graph_MergeSummary.pb")
-
-
-# In[ ]:
-
-
-freeze_graph.freeze_graph(input_graph=pbtxt_path,
-                          input_saver='',input_binary=False,
-                          input_checkpoint=ckpt_path,
-                          output_node_names='Merge/MergeSummary', 
-                          #output_node_names = 'group_deps', 
-                          #output_node_names ? Found the last node name in pbtxt_file: 'Merge/MergeSummary'
-                          # Or a random one in TensorBoard: 'group_deps', 
-                          
-                          restore_op_name='save/restore_all',
-                          filename_tensor_name='save/Const:0',
-                          output_graph=frozen_graph_path,
-                          clear_devices=True,initializer_nodes='')
-
-
-# ### Option b) With export_inference_graph.py
-# 
-# Dst tensors errors occur if many things running. Shutdown kernel and re-launch jupyter.
-
-# In[ ]:
-
-
-os.mkdir(os.path.join(path_to_root,'outputs/fasterRCNN_07_02_img_resize/export_inference'))
-os.path.join(path_to_root,'outputs/fasterRCNN_07_02_img_resize/export_inference')
-
-
-# In[5]:
-
-
-get_ipython().system(' python export_inference_graph.py     --input_type image_tensor     --pipeline_config_path ../../../../repos/dams/tfod/training/configs/07_02_imgsize_faster_rcnn_resnet50_coco.config     --trained_checkpoint_prefix ../../../../outputs/fasterRCNN_07_02_img_resize/model.ckpt-300000     --output_directory ../../../../outputs/fasterRCNN_07_02_img_resize/export_inference     --write_inference_graph True')
-
-
-# # Inference
-
-# In[32]:
-
 
 import argparse
 import glob
@@ -91,8 +35,7 @@ import humanfriendly
 
 ## IMPORTANT to avoid $DISPLAY problems:
 import matplotlib
-matplotlib.use('Agg')
-get_ipython().run_line_magic('matplotlib', 'inline')
+matplotlib.use('Agg') #TkAgg
 
 
 import matplotlib.image as mpimg
@@ -103,192 +46,174 @@ import numpy as np
 import tensorflow as tf
 from tqdm import tqdm
 
+# Inputs
 
-# In[20]:
+parser = argparse.ArgumentParser()
+
+parser.add_argument('--modelFile', type=str, 
+	help='TF Inference graph : frozen_model.pb, obtained with export_inference_graph.py')
+parser.add_argument('--imgDir', type=str,
+	help='directory of images to run inference on')
+parser.add_argument('--outputDir', type=str,
+	help='the directory where the txt files (one xxx.txt per xxx.png image) will be written')
+
+parser.add_argument('--bbox_format', type=str,
+	default='x1y1x2y2',
+	help='BBoxes format to write: x1y1x2y2_pixel, x1y1x2y2_norm, xywh_pixel or xywh_norm')
+parser.add_argument('--confidenceThreshold', type=float,
+	default='0.01',
+	help='Will only write bboxes with score > confidenceThreshold')
+parser.add_argument('--max_boxes_per_images', type=int,
+	default='1',
+	help='Will write this # of bboxes per image')
+
+args = parser.parse_args()
 
 
-from IPython.display import Image
-from run_tf_detector import *
 
-DEFAULT_CONFIDENCE_THRESHOLD = 0.85
+## Step 1/
 
 
-# In[74]:
 
-
-how_many_sample_images = 40
-
-frozen_graph_path = os.path.join(path_to_outputs, "export_inference/frozen_inference_graph.pb")
-
-sample_images = []
-for filename in os.listdir(os.path.join(path_to_root,'data/Sample_imagery_6-7'))[:how_many_sample_images]:
-    sample_images.append(os.path.join(path_to_root,'data/Sample_imagery_6-7',filename))
+def write_predicted_bb(boxes, scores, classes, inputFileNames, 
+                       outputDir, confidenceThreshold=DEFAULT_CONFIDENCE_THRESHOLD,
+                       output_format='txt_files',
+                       max_boxes_per_images=1,
+                       bbox_format='x1y1x2y2_norm'):
+    """
+    Outputs bbox: image_name.png, predicted_bbox, confidence
     
-outputDir = os.path.join(path_to_outputs, 'infered_sample40') 
-if not os.path.exists(outputDir):
-    os.mkdir(outputDir)
-
-
-# In[78]:
-
-
-load_and_run_detector(modelFile=frozen_graph_path,
-                      imageFileNames= sample_images,
-                      outputDir=outputDir,
-                      confidenceThreshold=DEFAULT_CONFIDENCE_THRESHOLD)
-
-
-# In[79]:
-
-
-for filename in os.listdir(outputDir):
-    i = os.path.join(outputDir, filename)
-    print(filename)
-    display(Image(i))
-
-
-# ### For humans to play to see if they are better than my algo!
-
-# In[82]:
-
-
-sample_images
-
-for filename in sample_images:
-    print(filename)
-    display(Image(filename))
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# ### Experiments: Steps by steps from run_tf_detector (instead of using wrapper fct load_and_run_detector() )
-
-# In[8]:
-
-
-## The base pre-trained model : faster_rcnn_resnet50_coco
-
-frozen_graph_path = os.path.join(path_to_root, "pre-trained-models/faster_rcnn_resnet50_coco/frozen_inference_graph.pb")
-frozen_graph_path
-
-
-# In[40]:
-
-
-sample_img_path = os.path.join(path_to_root,'data/Sample_imagery_6-7/116421_clipped.png')
-sample_img_path
-
-
-# In[56]:
-
-
-detection_graph = load_model(frozen_graph_path)
-detection_graph
-
-
-# In[61]:
-
-
-boxes,scores,classes,images = generate_detections(detection_graph,sample_img_path)
-
-
-# In[62]:
-
-
-outputDir = os.path.join(path_to_outputs, 'infered_sample') 
-outputFileName = os.path.join(outputDir, 'test_sample_img2.png') 
-
-
-# In[63]:
-
-
-render_bounding_boxes(boxes,
-                      scores,
-                      classes,
-                      inputFileNames=[sample_img_path],
-                      outputFileNames=[outputFileName],
-                      confidenceThreshold=DEFAULT_CONFIDENCE_THRESHOLD,
-                      linewidth=DEFAULT_LINE_WIDTH)
-
-
-# In[64]:
-
-
-from IPython.display import Image
-Image(filename=outputFileName) 
-
-
-# ### Now with OUR model 
-
-# In[22]:
-
-
-frozen_graph_path = os.path.join(path_to_outputs, "export_inference/frozen_inference_graph.pb")
-frozen_graph_path
-
-
-# In[23]:
-
-
-detection_graph = load_model(frozen_graph_path)
-
-
-# In[41]:
-
-
-boxes,scores,classes,images = generate_detections(detection_graph,sample_img_path)
-
-
-# In[42]:
-
-
-outputDir = os.path.join(path_to_outputs, 'infered_sample') 
-outputFileName = os.path.join(outputDir, 'test_sample_img3_my.png') 
-
-
-# In[48]:
-
-
-render_bounding_boxes(boxes,
-                      scores,
-                      classes,
-                      inputFileNames=[sample_img_path],
-                      outputFileNames=[outputFileName],
-                      confidenceThreshold=DEFAULT_CONFIDENCE_THRESHOLD,
-                      linewidth=DEFAULT_LINE_WIDTH)
-
-
-# In[49]:
-
-
-from IPython.display import Image
-Image(filename=outputFileName) 
-
-
-# In[ ]:
-
-
-
-
+    Writes json in format: 
+    {"image_name.png": {"predicted": [[<x_min>,<y_min>,<x_max>,<y_max>]], "confidence"[[<confidence>]]}}
+    
+    
+    [boxes] and [scores] should be in the format returned by generate_detections, 
+    specifically [top, left, bottom, right] in normalized units, where the
+    origin is the upper-left.    
+    
+    "classes" is currently unused, it's a placeholder for adding text annotations
+    later.
+    
+    Args:
+     - max_boxes_per_images : max number of bboxes per images. 
+     - confidenceThreshold : Will return only bboxes with confidence > confidenceThreshold
+     
+     - bbox_format: 'xywh_norm' for bbox normalized to image size: x, y, width, height
+                     'xywh_pixel' for bbox in pixels: x, y, width, height
+                     'x1y1x2y2_norm' ...
+                     
+                     
+     - output_format: txt_files leads to a txt files per image, named inputFileName.txt
+                      json leads to one json file : 
+                          {"image_name.png": {"predicted": [[<x_min>,<y_min>,<x_max>,<y_max>]], "confidence"[[<confidence>]]}}
+    """
+
+    detected_class = 0
+    
+    nImages = len(inputFileNames)
+    iImage = 0
+
+    for iImage in range(0,nImages):
+        
+        
+        if iImage%1000==0:
+            print('Wrote bbox text files for ',iImage,' images')
+            
+        inputFileName = inputFileNames[iImage]
+        imageName = inputFileName.rsplit('/',1)[-1][:-4]
+        outputFile = os.path.join(outputDir,imageName+'.txt')
+        
+        image = mpimg.imread(inputFileName)
+        iBox = 0; box = boxes[iImage][iBox]
+        
+        #dpi = 100
+        #s = image.shape; imageHeight = s[0]; imageWidth = s[1]
+        #figsize = imageWidth / float(dpi), imageHeight / float(dpi)
+        
+        for iBox,box in enumerate(boxes[iImage]):
+
+            score = scores[iImage][iBox]
+            if score < confidenceThreshold:
+                continue
+    
+            if iBox >= max_boxes_per_images:
+                break
+
+            if bbox_format=='x1y1x2y2_norm':
+                string_to_write = str(box[0])+' '+str(box[1])+' '+str(box[2])+' '+str(box[3])+' '+str(detected_class)+' '+str(score)
+                
+                
+                file = open(outputFile,'w') 
+                file.write(string_to_write)
+                file.close() 
+                
+            elif bbox_format=='xywh_norm':  
+                print('xywh_norm format todo')#TODO
+            
+            elif bbox_format=='xywh_pixel':
+                topRel = box[0]
+                leftRel = box[1]
+                bottomRel = box[2]
+                rightRel = box[3]
+
+                s = image.shape; imageHeight = s[0]; imageWidth = s[1]
+                x = leftRel * imageWidth
+                y = topRel * imageHeight
+                w = (rightRel-leftRel) * imageWidth
+                h = (bottomRel-topRel) * imageHeight
+
+                print()#TODO
+            
+            elif bbox_format=='minmax':
+                #...
+                print('minmax format not supported yet')
+            
+            
+def load_and_run_detector_to_bboxes(modelFile,
+                                    imgDir,
+                                    outputDir,
+                                    confidenceThreshold=0.05,
+                                    max_boxes_per_images=1,
+                                    bbox_format='x1y1x2y2_norm'):
+    
+    imageFileNames = [os.path.join(imgDir,f) for f in os.listdir(imgDir) if f.endswith('.png')]
+    
+    if len(imageFileNames) == 0:        
+        print('Warning: no files available')
+        return
+        
+    # Load and run detector on target images
+    print('Loading model...')
+    startTime = time.time()
+    detection_graph = load_model(modelFile)
+    elapsed = time.time() - startTime
+    print("Loaded model in {}".format(humanfriendly.format_timespan(elapsed)))
+    
+    boxes,scores,classes,images = generate_detections(detection_graph,imageFileNames)
+    
+    assert len(boxes) == len(imageFileNames)
+    
+    
+    if not os.path.exists(outputDir):
+        os.mkdir(outputDir)
+    
+    print('Writing predicted bboxes files ...')
+    write_predicted_bb(boxes=boxes, scores=scores, classes=classes,
+                       inputFileNames=imageFileNames, 
+                       outputDir=outputDir, confidenceThreshold=confidenceThreshold,
+                       output_format='txt_files',
+                       max_boxes_per_images=max_boxes_per_images,
+                       bbox_format=bbox_format)
+    
+    
+
+if __name__ == '__main__':
+    
+    main()
+    load_and_run_detector_to_bboxes(modelFile=args.modelFile,
+                                    imgDir=args.imgDir,
+                                    outputDir=args.outputDir,
+                                    confidenceThreshold=args.confidenceThreshold,
+                                    max_boxes_per_images=args.max_boxes_per_images,
+                                    bbox_format=args.bbox_format)
+              
