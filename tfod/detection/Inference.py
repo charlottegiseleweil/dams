@@ -58,7 +58,7 @@ parser.add_argument('--outputDir', type=str,
 	help='the directory where the txt files (one xxx.txt per xxx.png image) will be written')
 
 parser.add_argument('--bbox_format', type=str,
-	default='x1y1x2y2',
+	default='y1x1y2x2',
 	help='BBoxes format to write: x1y1x2y2_pixel, x1y1x2y2_norm, xywh_pixel or xywh_norm')
 parser.add_argument('--confidenceThreshold', type=float,
 	default='0.01',
@@ -76,10 +76,10 @@ args = parser.parse_args()
 
 
 def write_predicted_bb(boxes, scores, classes, inputFileNames, 
-                       outputDir, confidenceThreshold=DEFAULT_CONFIDENCE_THRESHOLD,
+                       outputDir, confidenceThreshold=0.05,
                        output_format='txt_files',
                        max_boxes_per_images=1,
-                       bbox_format='x1y1x2y2_norm'):
+                       bbox_format='y1x1y2x2'):
     """
     Outputs bbox: image_name.png, predicted_bbox, confidence
     
@@ -139,7 +139,7 @@ def write_predicted_bb(boxes, scores, classes, inputFileNames,
             if iBox >= max_boxes_per_images:
                 break
 
-            if bbox_format=='x1y1x2y2_norm':
+            if bbox_format=='y1x1y2x2':
                 string_to_write = str(box[0])+' '+str(box[1])+' '+str(box[2])+' '+str(box[3])+' '+str(detected_class)+' '+str(score)
                 
                 
@@ -174,7 +174,7 @@ def load_and_run_detector_to_bboxes(modelFile,
                                     outputDir,
                                     confidenceThreshold=0.05,
                                     max_boxes_per_images=1,
-                                    bbox_format='x1y1x2y2_norm'):
+                                    bbox_format='y1x1y2x2'):
     
     imageFileNames = [os.path.join(imgDir,f) for f in os.listdir(imgDir) if f.endswith('.png')]
     
@@ -208,8 +208,7 @@ def load_and_run_detector_to_bboxes(modelFile,
     
 
 if __name__ == '__main__':
-    
-    main()
+
     load_and_run_detector_to_bboxes(modelFile=args.modelFile,
                                     imgDir=args.imgDir,
                                     outputDir=args.outputDir,
