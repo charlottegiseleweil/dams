@@ -23,7 +23,7 @@ python export_inference_graph.py \
     --write_inference_graph True
 ```
 
-2) Run detector [dams/tfod/detection/run_detector_to_bboxes.py](https://github.com/charlottegiseleweil/dams/tree/master/tfod/detection/run_detector_to_bboxes.py)
+2) Run detector [inference.py](https://github.com/charlottegiseleweil/dams/tree/master/tfod/detection/inference.py)
 
 Playground/Visualize inference on a few images: [Inference notebook](https://github.com/charlottegiseleweil/dams/blob/master/tfod/detection/Inference.ipynb)
 
@@ -31,4 +31,10 @@ Playground/Visualize inference on a few images: [Inference notebook](https://git
 See [dams/yolov3/readme_ultralytics.md](https://github.com/charlottegiseleweil/dams/blob/master/yolov3/readme_ultralytics.md)
 
 # Evaluation
-[Work in progress]
+1) Store results table (a row per observation), with column Results@IoU@Conf with TP, FP, TN, FN at specific IoU and minimum confidence threshold.
+* results_{set}_{model}.csv with for one row per image
+* results_sparse for one row per observation (duplicate images that have FP+FN) [make_results_table]
+
+2) Calculate custom Evaluation metric: Recall @ 5% IoU and min confidence threshold = ??? [evaluation.py]
+
+3) Visualize images
