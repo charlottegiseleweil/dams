@@ -59,8 +59,6 @@ import numpy as np
 import tensorflow as tf
 from tqdm import tqdm
 
-from run_tf_detector import *
-
 # Inputs
 
 parser = argparse.ArgumentParser()
