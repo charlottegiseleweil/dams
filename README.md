@@ -1,19 +1,19 @@
-This repo contains the work in progress Deep Learning part of [NatCap](https://naturalcapitalproject.stanford.edu/) *Detecting Dams with AI and Satellite Imagery*. 
-It is funded by the National Geogrpahic and Microsoft AI for Earth program. 
+This repo contains the work in progress Deep Learning part of [NatCap](https://naturalcapitalproject.stanford.edu/)'s *Detecting Dams with AI and Satellite Imagery* project. 
+It is funded by the National Geographic and Microsoft AI for Earth program. 
 
 # Imagery
 See https://bitbucket.org/natcap/extract-dams/src/default/
 
-# Training (TFOD)
+# Training
 
 See readme in [dams/tfod/training/](https://github.com/charlottegiseleweil/dams/tree/master/tfod/training)
 ```
 python model_train.py --logtostderr --train_dir=training/ --pipeline_config_path=training/{{CONFIG FILE}}.config
 ```
 
-# Inference (TFOD)
+# Inference
 
-1) Export frozen graph with [dams/tfod/detection/export_inference_graph.py](https://github.com/charlottegiseleweil/dams/tree/master/tfod/detection)
+1) Export frozen graph with [dams/tfod/detection/export\_inference_graph.py](https://github.com/charlottegiseleweil/dams/tree/master/tfod/detection)
 ```
 python export_inference_graph.py \
     --input_type image_tensor \
@@ -27,14 +27,30 @@ python export_inference_graph.py \
 
 Playground/Visualize inference on a few images: [Inference notebook](https://github.com/charlottegiseleweil/dams/blob/master/tfod/detection/Inference.ipynb)
 
-# Training & Inference (Darknet)
-See [dams/yolov3/readme_ultralytics.md](https://github.com/charlottegiseleweil/dams/blob/master/yolov3/readme_ultralytics.md)
 
 # Evaluation
-1) Store results table (a row per image), with column Write_results_csv.py with TP, FP, TN, FN at specific IoU and minimum confidence threshold.
-* results_{set}_{model}.csv with for one row per image
-* results_sparse for one row per observation (duplicate images that have FP+FN) [make_results_table]
+See [Evaluation notebook](https://github.com/charlottegiseleweil/dams/blob/master/evaluation/Evaluation.ipynb)
 
-2) Calculate custom Evaluation metric: Recall @ 5% IoU and min confidence threshold = ??? [evaluation.py]
+1) Store results table (a row per image), with [Write\_results_csv.py](https://github.com/charlottegiseleweil/dams/blob/master/evaluation/Write_results_csv.py)
 
-3) Visualize images
+2) Calculate custom [Evaluation metric](https://github.com/charlottegiseleweil/dams/blob/master/evaluation/evaluation_utils.py): 
+
+  * Recall @ IoU 5% and Confidence > 0.1.
+  *  for _Small Dams_ (bbox 500-1800 pixels, i.e dam of ~meters)
+
+3) [Visualize](https://github.com/charlottegiseleweil/dams/blob/master/evaluation/viz_utils.py) images (to analyze mistakes etc..)
+
+4) Human baseline performance
+
+_____
+# Samples
+
+![](samples/results_FasterRCNN_07-27/TP2.png)
+![](samples/results_FasterRCNN_07-27/TP1.png)
+![](samples/results_FasterRCNN_07-27/FP1.png)
+![](samples/results_FasterRCNN_07-27/TP.png)
+
+______
+### Other experiments 
+##### Single shot detectors (YOLOv3 with Darknet)
+See [dams/yolov3/readme_ultralytics.md](https://github.com/charlottegiseleweil/dams/blob/master/yolov3/readme_ultralytics.md)
