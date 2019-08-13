@@ -1,12 +1,24 @@
 """
 
+
+ Write_results_csv.py
+ 
+ Creates results dataframe from directories and format for ground truth boxes and predicted boxes. 
+    done in Evaluation notebook.
+ 
+ Charlotte Weil, August 2019
+
+
+- - - - - 
+
+
 Args:
     path_to_root = '../../..'
 
     GT_bbox_Dir = os.path.join(path_to_root, 'data/yolov3-inputs_imagery-7-25_cropped_419/validation_set/labels/')
     Pred_bbox_Dir = os.path.join(path_to_root, 'outputs/fasterRCNN_07_27_newimagery/export_inference/validationset_inference_fasterRCNN_07_27_newimagery')
-    gt_format = 'xywh_norm'
-    pred_format = 'y1x1y2x2_norm'
+    gt_format = 'xywh_pix'
+    pred_format = 'y1x1y2x2_pix'
 
     outputFile = os.path.join(path_to_root, 'results/results_validation_fasterRCNN-07-27_.csv')
 
@@ -30,8 +42,8 @@ parser.add_argument('--GT_bbox_Dir', type=str, help='directory with txt files co
 parser.add_argument('--Pred_bbox_Dir', type=str, help='directory with txt files containing predicted bboxes')
 parser.add_argument('--outptuFile', type=str, help='filepath to results_{set}_{model}.csv to write')
 
-parser.add_argument('--gt_format', type=str, default='xywh_norm', help='txt format for GT bbox files')
-parser.add_argument('--pred_format', type=str, default='y1x1y2x2_norm', help='txt format for predicted bbox files')
+parser.add_argument('--gt_format', type=str, default='xywh_pix', help='txt format for GT bbox files')
+parser.add_argument('--pred_format', type=str, default='y1x1y2x2_pix', help='txt format for predicted bbox files')
 
 args = parser.parse_args()
 
@@ -61,13 +73,13 @@ def parse_txt (label_fp, format_bbox, gt_or_pred):
     """Obtain x_min, y_min, x_max, and y_max of bounding box from txt file
     Args:
         label_fp (str): filepath to bounding box .txt file in detect.py output format
-        format_bbox: 'x1y1x2y2' or 'xywh_norm' or 'x1y1x2y2_norm'
+        format_bbox: 'x1y1x2y2' or 'xywh_pix' or 'x1y1x2y2_pix'
         gt_or_pred: 'predicted' or 'ground_truth'
     Returns:
         coords (numpy array)
         conf (float, returned only if dataset == 'predicted')
     """
-    if format_bbox == 'y1x1y2x2_norm':
+    if format_bbox == 'y1x1y2x2_pix':
         with open(label_fp, 'r') as label:
             line = str(label.readline())
             if len(line) == 0:
@@ -85,7 +97,7 @@ def parse_txt (label_fp, format_bbox, gt_or_pred):
                     conf = float(vals[5])
                     conf = '%.4f'%(conf)
                     return coords, conf
-    elif format_bbox == 'xywh_norm':
+    elif format_bbox == 'xywh_pix':
         with open(label_fp, 'r') as label:
             line = str(label.readline())
             if len(line) == 0:
@@ -123,10 +135,10 @@ def calc_IoU (bb1, bb2, gt_format, pred_format):
     """
     
     # convert to x1y1x2y2 format if needed
-    if gt_format == 'y1x1y2x2_norm':
+    if gt_format == 'y1x1y2x2_pix':
         y_max, x_min, y_min, x_max = bb1
         bb1 = [x_min, y_min, x_max, y_max]
-    if pred_format == 'y1x1y2x2_norm':
+    if pred_format == 'y1x1y2x2_pix':
         y_max, x_min, y_min, x_max = bb2
         bb2 = [x_min, y_min, x_max, y_max]
 
@@ -157,7 +169,7 @@ def calc_IoU (bb1, bb2, gt_format, pred_format):
 
 
 
-def make_results_table (gt_bbox_dir, pred_bbox_dir, outputFile, gt_format='xywh_norm', pred_format='y1x1y2x2_norm'):
+def make_results_table (gt_bbox_dir, pred_bbox_dir, outputFile, gt_format='xywh_pix', pred_format='y1x1y2x2_pix'):
     '''
     Creates dataframe from directories and format for ground truth boxes and predicted boxes. 
     Args:
@@ -167,8 +179,8 @@ def make_results_table (gt_bbox_dir, pred_bbox_dir, outputFile, gt_format='xywh_
         outputFile : filepath to .csv results table to write (results_{set}_{model}.csv)
         
         
-        gt_format (Optional): format of ground truth bounding boxes 'y1x1y2x2_norm' or 'xywh_norm'. Default is 'xywh_norm'
-        pred_format (Optional): format of ground truth bounding boxes 'y1x1y2x2_norm' or 'xywh_norm' . Default is 'y1x1y2x2_norm'
+        gt_format (Optional): format of ground truth bounding boxes 'y1x1y2x2_pix' or 'xywh_pix'. Default is 'xywh_pix'
+        pred_format (Optional): format of ground truth bounding boxes 'y1x1y2x2_pix' or 'xywh_pix' . Default is 'y1x1y2x2_pix'
     Returns:
         dataframe with cols:
         ['img_id','gt_bbox','gt_format','pred_bbox','pred_format','confidence','gt_size','iou']
