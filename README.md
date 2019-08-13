@@ -31,7 +31,7 @@ Playground/Visualize inference on a few images: [Inference notebook](https://git
 See [dams/yolov3/readme_ultralytics.md](https://github.com/charlottegiseleweil/dams/blob/master/yolov3/readme_ultralytics.md)
 
 # Evaluation
-1) Store results table (a row per observation), with column Results@IoU@Conf with TP, FP, TN, FN at specific IoU and minimum confidence threshold.
+1) Store results table (a row per image), with column Write_results_csv.py with TP, FP, TN, FN at specific IoU and minimum confidence threshold.
 * results_{set}_{model}.csv with for one row per image
 * results_sparse for one row per observation (duplicate images that have FP+FN) [make_results_table]
 
