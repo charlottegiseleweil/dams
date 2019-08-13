@@ -24,6 +24,16 @@ python export_inference_graph.py \
 ```
 
 2) Run detector [inference.py](https://github.com/charlottegiseleweil/dams/tree/master/tfod/detection/inference.py)
+```
+python inference.py
+          --modelFile {path_to_frozen_graph.pb} 
+          --imgDir {path_to_dir}
+          --outputDir {path_to_dir}
+          --bbox_format (Optional) {outputs bboxes format. Default is y1x1y2x2_pixel}
+          --confidenceThreshold (Optional) writes only bboxes above this threshold. Default to 0.05
+          --max_boxes_per_images (Optional) {int} Will write this # of bboxes per image. Default to 1
+```
+
 
 Playground/Visualize inference on a few images: [Inference notebook](https://github.com/charlottegiseleweil/dams/blob/master/tfod/detection/Inference.ipynb)
 
