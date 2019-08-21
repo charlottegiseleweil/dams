@@ -309,7 +309,7 @@ def write_predicted_bb(boxes, scores, classes, inputFileNames,
     for iImage in range(0,nImages):
 
 
-        if iImage%1==0:
+        if iImage%1==400:
             print('Wrote bbox text files for ',iImage,' images')
 
         inputFileName = inputFileNames[iImage]
@@ -356,8 +356,8 @@ def write_predicted_bb(boxes, scores, classes, inputFileNames,
                 print(bbox_format,' format not supported yet -- Let Charlie know if you need this!')
 
             
-            file = open(outputFile,'w')
-            file.write(string_to_write)
+            file = open(outputFile,'a')
+            file.write(string_to_write+'\n')
             file.close()
 
 
@@ -404,6 +404,8 @@ def load_and_run_detector_to_bboxes(modelFile,
                        output_format='txt_files',
                        max_boxes_per_images=max_boxes_per_images,
                        bbox_format=bbox_format)
+
+    print('... Done!')
 
 
 

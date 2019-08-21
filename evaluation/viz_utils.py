@@ -55,7 +55,8 @@ def visualize_bboxes(df, images_dir,
                      max_images=100,
                     BIG_IMAGES=False,
                     SHOW_CONFIDENCE_VALUES=True,
-                    NO_BOXES=False):
+                    NO_BOXES=False,
+                    save_dir=False):
     
     if df.index.name != 'img_id':
         df = df.set_index('img_id')
@@ -134,5 +135,11 @@ def visualize_bboxes(df, images_dir,
             ax.yaxis.set_major_locator(ticker.NullLocator())
             ax.axis('tight')
             ax.set(xlim=[0,imageWidth],ylim=[imageHeight,0],aspect=1)
-            plt.axis('off')  
+            plt.axis('off') 
+            
+        if save_dir !=False:
+            #Save only subplot corresponding to img_fn
+            extent = ax.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
+            fig.savefig(os.path.join(saveDir,img_fn), bbox_inches=extent,dpi=150)
+            
             

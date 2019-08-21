@@ -169,7 +169,8 @@ def calc_IoU (bb1, bb2, gt_format, pred_format):
 
 
 
-def make_results_table (gt_bbox_dir, pred_bbox_dir, outputFile, gt_format='xywh_pix', pred_format='y1x1y2x2_pix'):
+def make_results_table (gt_bbox_dir, pred_bbox_dir, outputFile,
+                        gt_format='xywh_pix', pred_format='y1x1y2x2_pix'):
     '''
     Creates dataframe from directories and format for ground truth boxes and predicted boxes. 
     Args:
