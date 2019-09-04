@@ -63,4 +63,4 @@ _____
 ______
 ### Other experiments 
 ##### Single shot detectors (YOLOv3 with Darknet)
-See [dams/yolov3/readme_ultralytics.md](https://github.com/charlottegiseleweil/dams/blob/master/yolov3/readme_ultralytics.md)
+See [dams/experimental/yolov3/readme_ultralytics.md](https://github.com/charlottegiseleweil/dams/blob/master/experimental/yolov3/readme_ultralytics.md)
