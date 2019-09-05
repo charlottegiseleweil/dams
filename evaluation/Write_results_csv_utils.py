@@ -129,7 +129,7 @@ def calc_IoU (bb1, bb2, gt_format, pred_format):
 
 
 
-def make_results_table (gt_bbox_dir, pred_bbox_dir, outputFile,
+def make_results_table (imgs_dir,gt_bbox_dir, pred_bbox_dir, outputFile,
                         gt_format='xywh_pix', pred_format='y1x1y2x2_pix'):
     '''
     Creates dataframe from directories and format for ground truth boxes and predicted boxes. 
@@ -152,6 +152,7 @@ def make_results_table (gt_bbox_dir, pred_bbox_dir, outputFile,
     startTime = time.time()
     
     # collect list of filenames
+    imgs_fn = [fn[:-4] for fn in os.listdir(imgs_dir)]
     pred_bbox_fn = [fn[:-4] for fn in os.listdir(pred_bbox_dir)]
     gt_bbox_fn = [fn[:-4] for fn in os.listdir(gt_bbox_dir)]
     
@@ -173,7 +174,7 @@ def make_results_table (gt_bbox_dir, pred_bbox_dir, outputFile,
     
     # build dataframe of image, ground_truth bboxes, predicted bboxes, and confidence
     print('Creating results table with ...')
-    data = {'img_id' : gt_bbox_fn[:-4]}
+    data = {'img_id' : imgs_fn}
     detect_df = pd.DataFrame(data, columns=['img_id'])
     
     print('... GT bboxes')
@@ -189,10 +190,9 @@ def make_results_table (gt_bbox_dir, pred_bbox_dir, outputFile,
     
     # add ground_truth bbox size to dataframe
     print('... Bbox size')
-    detect_df['gt_size'] = detect_df.apply(
-        lambda row: None if row.gt_bbox is None else int((row.gt_bbox[2] - row.gt_bbox[0]) * (row.gt_bbox[3] - row.gt_bbox[1])), 
-        axis=1
-    )
+    detect_df['gt_size'] = detect_df['gt_bbox'].apply(lambda x: 
+                                                  None if (x is np.nan or x is None)
+                                                  else int((x[2] - x[0]) * (x[3] - x[1])))
 
     
     # add IoU - cameratraps to dataframe
@@ -200,7 +200,7 @@ def make_results_table (gt_bbox_dir, pred_bbox_dir, outputFile,
     print('... IoU')
     iou_dict = {}
     for fn in predicted_dict:
-        if 'not_a_dam' not in fn:
+        if ('not_a_dam' not in fn) and ('_' not in fn):
             iou = calc_IoU(ground_truth_dict[fn], predicted_dict[fn], gt_format, pred_format)
             iou_dict[fn] = iou
         else:
