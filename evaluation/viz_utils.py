@@ -55,8 +55,12 @@ def visualize_bboxes(df, images_dir,
                      max_images=100,
                     BIG_IMAGES=False,
                     SHOW_CONFIDENCE_VALUES=True,
-                    NO_BOXES=False,
+                    BOXES='All',
                     save_dir=False):
+    """
+    BOXES : 'All', 'None', 'pred', 'gt' 
+    
+    """
     
     if df.index.name != 'img_id':
         df = df.set_index('img_id')
@@ -73,73 +77,76 @@ def visualize_bboxes(df, images_dir,
         #  Image
         img_fn= img_id+'.png'
         img_fp = os.path.join(images_dir, img_fn)
-        img = mpimg.imread(img_fp)
-        s = img.shape; imageHeight = s[0]; imageWidth = s[1]
-        logging.debug(img_id)
-         
-        # GT_bbox
-        if pd.notnull(df.loc[img_id].gt_bbox) and NO_BOXES!=True:
-            gt_coords = parse_bbox_str_to_list(df.loc[img_id].gt_bbox)
-            if df.iloc[0].gt_format == 'xywh_pix':
-                gt_bbox = box(gt_coords[0], gt_coords[1], gt_coords[2], gt_coords[3])
-            elif df.iloc[0].gt_format == 'y1x1y2x2_pix':
-                gt_bbox = box(gt_coords[1], gt_coords[2], gt_coords[3], gt_coords[0])
-            x_gt,y_gt = gt_bbox.exterior.xy
-            
-        # Predicted_bbox
-        if pd.notnull(df.loc[img_id].pred_bbox) and NO_BOXES!=True:
-            pred_coords = parse_bbox_str_to_list(df.loc[img_id].pred_bbox)
-            if df.iloc[0].pred_format == 'xywh_pix':
-                pred_bbox = box(pred_coords[0], pred_coords[1], pred_coords[2], pred_coords[3])
-            elif df.iloc[0].pred_format == 'y1x1y2x2_pix':
-                pred_bbox = box(pred_coords[1], pred_coords[2], pred_coords[3], pred_coords[0])
-            x_pr,y_pr = pred_bbox.exterior.xy
-            # Confidence & IoU
-            img_conf = df.loc[img_id].confidence
-            img_iou = str('%.2f'%(float(df.loc[img_id].iou))) 
- 
-            
-        # Plot
-        ax = fig.add_subplot(20,1,k)
-        if NO_BOXES!=True:
-            ax.set_title(img_id)# + '    confidence: ' + img_conf + '    iou: ' + img_iou)
-        ax.imshow(img)
-        
-        try: # If there are GT bboxes
-            ax.plot(x_gt,y_gt,color='lightblue',linewidth=4)
-        except NameError:
-            pass
-        
-        try: # If there are predicted bboxes
-            ax.plot(x_pr,y_pr,color='orange',linewidth=4)
-            
-            if SHOW_CONFIDENCE_VALUES == True:
-                 # origin is top left
-                iLeft = pred_coords[1]   #(origin x)
-                iBottom = pred_coords[0] #(origin y)
-                pLabel = '({:.2f})'.format(img_conf)
-                ax.text(iLeft+5,iBottom+5,pLabel,
-                        color='orange',fontsize=12,
-                        verticalalignment='top')
-        except NameError:
-            pass
+        try:
+            img = mpimg.imread(img_fp)
+        except FileNotFoundError:
+            print("File Not Found: ",img_fp)
+        else:
+            s = img.shape; imageHeight = s[0]; imageWidth = s[1]
+            logging.debug(img_id)
 
-        # This is magic goop that removes whitespace around image plots (sort of)        
-        ax.xaxis.set_major_locator(ticker.NullLocator())
-        ax.yaxis.set_major_locator(ticker.NullLocator())
-        if BIG_IMAGES == True:
-            plt.subplots_adjust(top = 1, bottom = 0, right = 1, left = 0, hspace = 0, 
-                            wspace = 0)
-            plt.margins(0,0)
+            # GT_bbox
+            if pd.notnull(df.loc[img_id].gt_bbox) and (BOXES=='All'or BOXES =='gt'):
+                gt_coords = parse_bbox_str_to_list(df.loc[img_id].gt_bbox)
+                if df.iloc[0].gt_format == 'xywh_pix':
+                    gt_bbox = box(gt_coords[0], gt_coords[1], gt_coords[2], gt_coords[3])
+                elif df.iloc[0].gt_format == 'x1y1x1y2_pix':
+                    gt_bbox = box(gt_coords[1], gt_coords[2], gt_coords[3], gt_coords[0])
+                x_gt,y_gt = gt_bbox.exterior.xy
+
+            # Predicted_bbox
+            if pd.notnull(df.loc[img_id].pred_bbox) and (BOXES=='All'or BOXES =='pred'):
+                pred_coords = parse_bbox_str_to_list(df.loc[img_id].pred_bbox)
+                if df.iloc[0].pred_format == 'xywh_pix':
+                    pred_bbox = box(pred_coords[0], pred_coords[1], pred_coords[2], pred_coords[3])
+                elif df.iloc[0].pred_format == 'y2x1y1x1_pix':
+                    pred_bbox = box(pred_coords[1], pred_coords[2], pred_coords[3], pred_coords[0])
+                x_pr,y_pr = pred_bbox.exterior.xy
+                # Confidence & IoU
+                img_conf = df.loc[img_id].confidence
+                img_iou = str('%.2f'%(float(df.loc[img_id].iou))) 
+
+
+            # Plot
+            ax = fig.add_subplot(20,1,k)
+            if BOXES!='None':
+                ax.set_title(img_id)# + '    confidence: ' + img_conf + '    iou: ' + img_iou)
+            ax.imshow(img)
+
+            try: # If there are GT bboxes
+                ax.plot(x_gt,y_gt,color='lightblue',linewidth=4)
+            except NameError:
+                pass
+
+            try: # If there are predicted bboxes
+                ax.plot(x_pr,y_pr,color='orange',linewidth=4)
+
+                if SHOW_CONFIDENCE_VALUES == True:
+                     # origin is top left
+                    iLeft = pred_coords[1]   #(origin x)
+                    iBottom = pred_coords[0] #(origin y)
+                    pLabel = '({:.2f})'.format(img_conf)
+                    ax.text(iLeft+5,iBottom+5,pLabel,
+                            color='orange',fontsize=12,
+                            verticalalignment='top')
+            except NameError:
+                pass
+
+            # This is magic goop that removes whitespace around image plots (sort of)        
             ax.xaxis.set_major_locator(ticker.NullLocator())
             ax.yaxis.set_major_locator(ticker.NullLocator())
-            ax.axis('tight')
-            ax.set(xlim=[0,imageWidth],ylim=[imageHeight,0],aspect=1)
-            plt.axis('off') 
-            
-        if save_dir !=False:
-            #Save only subplot corresponding to img_fn
-            extent = ax.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
-            fig.savefig(os.path.join(saveDir,img_fn), bbox_inches=extent,dpi=150)
-            
-            
+            if BIG_IMAGES == True:
+                plt.subplots_adjust(top = 1, bottom = 0, right = 1, left = 0, hspace = 0, 
+                                wspace = 0)
+                plt.margins(0,0)
+                ax.xaxis.set_major_locator(ticker.NullLocator())
+                ax.yaxis.set_major_locator(ticker.NullLocator())
+                ax.axis('tight')
+                ax.set(xlim=[0,imageWidth],ylim=[imageHeight,0],aspect=1)
+                plt.axis('off') 
+
+            if save_dir !=False:
+                #Save only subplot corresponding to img_fn
+                extent = ax.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
+                fig.savefig(os.path.join(saveDir,img_fn[:-4]+'_'+BOXES+'.png'),
+                            bbox_inches=extent,dpi=150)
