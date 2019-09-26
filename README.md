@@ -2,7 +2,8 @@ This repo contains the work in progress Deep Learning part of [NatCap](https://n
 It is funded by the National Geographic and Microsoft AI for Earth program. 
 
 # Imagery
-See https://bitbucket.org/natcap/extract-dams/src/default/
+Labeling data: merged xx databases, and bounded xx dams (with http://natgeoserver.ecoshard.org:8888/).
+Fetching Planet Imagery: https://bitbucket.org/natcap/extract-dams/src/default/
 
 # Training
 
