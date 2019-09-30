@@ -31,7 +31,7 @@ cols = ['img_id','gt_bbox','gt_format','pred_bbox','pred_format','confidence','g
 def parse_bbox_str_to_list(bbox_str):
     '''Parse [a b c d] to [a,b,c,d]'''
     logging.debug(bbox_str)
-    bbox_without_brackets = bbox_str.replace('[ ','').replace('[','').replace(']','').replace('  ',' ').replace('  ',' ')
+    bbox_without_brackets = bbox_str.replace(',','').replace('  ',' ').replace('  ',' ').replace('[ ','').replace('[','').replace(']','').replace('  ',' ').replace('  ',' ').replace('  ',' ').replace('  ',' ')
     vals = bbox_without_brackets.split(' ')
     logging.debug(vals)
     bbox_list = [float(vals[0]),float(vals[1]),float(vals[2]),float(vals[3])]
@@ -91,12 +91,15 @@ def visualize_bboxes(df, images_dir,
                 if df.iloc[0].gt_format == 'xywh_pix':
                     gt_bbox = box(gt_coords[0], gt_coords[1], gt_coords[2], gt_coords[3])
                 elif df.iloc[0].gt_format == 'x1y1x1y2_pix':
-                    gt_bbox = box(gt_coords[1], gt_coords[2], gt_coords[3], gt_coords[0])
+                    gt_bbox = box(gt_coords[0], gt_coords[1], gt_coords[2], gt_coords[3])
                 x_gt,y_gt = gt_bbox.exterior.xy
 
             # Predicted_bbox
-            if pd.notnull(df.loc[img_id].pred_bbox) and (BOXES=='All'or BOXES =='pred'):
-                pred_coords = parse_bbox_str_to_list(df.loc[img_id].pred_bbox)
+            if (type(df.loc[img_id].pred_bbox)!=float) and (BOXES=='All'or BOXES =='pred'): # because if float > is null.
+                if type(df.loc[img_id].pred_bbox) == str:
+                    pred_coords = parse_bbox_str_to_list(df.loc[img_id].pred_bbox)
+                else:
+                    pred_coords = df.loc[img_id].pred_bbox
                 if df.iloc[0].pred_format == 'xywh_pix':
                     pred_bbox = box(pred_coords[0], pred_coords[1], pred_coords[2], pred_coords[3])
                 elif df.iloc[0].pred_format == 'y2x1y1x1_pix':
@@ -132,6 +135,10 @@ def visualize_bboxes(df, images_dir,
             except NameError:
                 pass
 
+            ## Important ! Delete variables, so bboxes don't get plotted on next image !!
+            x_gt,y_gt,y_pr,x_pr= 0,0,0,0
+            del x_gt,y_gt,y_pr,x_pr
+
             # This is magic goop that removes whitespace around image plots (sort of)        
             ax.xaxis.set_major_locator(ticker.NullLocator())
             ax.yaxis.set_major_locator(ticker.NullLocator())
@@ -148,5 +155,5 @@ def visualize_bboxes(df, images_dir,
             if save_dir !=False:
                 #Save only subplot corresponding to img_fn
                 extent = ax.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
-                fig.savefig(os.path.join(saveDir,img_fn[:-4]+'_'+BOXES+'.png'),
+                fig.savefig(os.path.join(save_dir,img_fn[:-4]+'_'+BOXES+'.png'),
                             bbox_inches=extent,dpi=150)
