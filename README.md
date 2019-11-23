@@ -59,7 +59,7 @@ See [Evaluation notebook](https://github.com/charlottegiseleweil/dams/blob/maste
 4) Human baseline performance
 
 /!\ To fix:
-1) Results table only retains 1 bbox/images, allow for several bboxes/img.
+1) Results table only retains 1 bbox/images, allow for several bboxes/img (must re-run Inference.py to get several bboxes/img)
 2) Fix Custom eval metric (Category column)
 
 _____
