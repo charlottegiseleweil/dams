@@ -2,10 +2,15 @@ This repo contains the work in progress Deep Learning part of [NatCap](https://n
 It is funded by the National Geographic and Microsoft AI for Earth program. 
 
 # Imagery
-Labeling data: merged xx databases, and bounded xx dams (with http://natgeoserver.ecoshard.org:8888/).
-Fetching Planet Imagery: https://bitbucket.org/natcap/extract-dams/src/default/
+
+1) Labeling data: merged xx databases, and bounded xx dams (with http://natgeoserver.ecoshard.org:8888/).
+2) Fetching Planet Imagery: https://bitbucket.org/natcap/extract-dams/src/default/
+3) Offset imagery so dam isn't always centered: (Maanas) https://github.com/charlottegiseleweil/dams/blob/master/utils/image_preprocessing/create_cropped_offset_imagery.ipynb
+
 
 # Training
+
+1) Format Inputs (Make TFRecords): 
 
 See readme in [dams/tfod/training/](https://github.com/charlottegiseleweil/dams/tree/master/tfod/training)
 ```
@@ -52,6 +57,10 @@ See [Evaluation notebook](https://github.com/charlottegiseleweil/dams/blob/maste
 3) [Visualize](https://github.com/charlottegiseleweil/dams/blob/master/evaluation/viz_utils.py) images (to analyze mistakes etc..)
 
 4) Human baseline performance
+
+/!\ To fix:
+1) Results table only retains 1 bbox/images, allow for several bboxes/img.
+2) Fix Custom eval metric (Category column)
 
 _____
 # Samples
