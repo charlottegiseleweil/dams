@@ -10,9 +10,8 @@ It is funded by the National Geographic and Microsoft AI for Earth program.
 
 # Training
 
-1) Format Inputs (Make TFRecords): 
-
-See readme in [dams/tfod/training/](https://github.com/charlottegiseleweil/dams/tree/master/tfod/training)
+1) Format Inputs (Make TFRecords) (see [TFOD Preprocessing](https://github.com/charlottegiseleweil/dams/tree/master/tfod/preprocessing))
+2) Train: see readme in [dams/tfod/training/](https://github.com/charlottegiseleweil/dams/tree/master/tfod/training)
 ```
 python model_train.py --logtostderr --train_dir=training/ --pipeline_config_path=training/{{CONFIG FILE}}.config
 ```
